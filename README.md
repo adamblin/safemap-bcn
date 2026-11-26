@@ -1,30 +1,30 @@
 # 🛡️ SafeMap BCN
 
-Mapa colaborativo y anónimo para que las mujeres puedan planificar por dónde moverse en Barcelona.
+A collaborative, anonymous map that helps women plan how to get around Barcelona.
 
-- **Mapa de calor** 🟢 seguro · 🟡 precaución · 🔴 inseguro, calculado a partir de los reportes de la comunidad.
-- **Día / Noche**: la sensación de seguridad cambia con la hora; por defecto se muestra la del momento actual.
-- **Ruta segura**: compara rutas a pie y marca la más segura, coloreando cada tramo.
-- **Reportes anónimos**: sin registro, posición redondeada a ~10 m.
-- **Moderación comunitaria**: un reporte necesita 2 confirmaciones para contar del todo y se oculta si la comunidad lo marca como falso.
-- Botón directo al **112**.
+- **Heat map**: 🟢 safe · 🟡 caution · 🔴 unsafe, calculated from community reports.
+- **Day / Night**: how safe a place feels changes with the time; by default the map shows the current one.
+- **Safe route**: compares walking routes, highlights the safest one and colours each section.
+- **Anonymous reports**: no sign-up, location rounded to ~10 m.
+- **Community moderation**: a report needs 2 confirmations to count fully and is hidden if the community flags it as fake.
+- One-tap **112** emergency button.
 
-Toda la app está en un único archivo: [`index.html`](index.html) (HTML + CSS + JS).
+The whole app is a single file: [`index.html`](index.html) (HTML + CSS + JS).
 
-## Usarla
+## Use it
 
-Abre `index.html` en el navegador, o la versión publicada en GitHub Pages.
+Open `index.html` in a browser, or use the GitHub Pages version: https://adamblin.github.io/safemap-bcn/
 
-## Tecnología
+Direct links: `?map` (skips the welcome screen) and `?mode=night`, `?mode=day` or `?mode=all`.
 
-- [Leaflet](https://leafletjs.com/) 1.9.4, **incluido dentro del propio index.html** (no depende de ningún CDN).
-- Mapa de calles con proveedores de respaldo: si uno falla o tarda más de 7 s se pasa al siguiente
-  (Esri World Street Map → OpenStreetMap DE → OSM France → OpenStreetMap). El modo noche oscurece el mismo mapa con un filtro CSS.
-- Búsqueda: [Nominatim](https://nominatim.org/) · Rutas a pie: [OSRM](https://routing.openstreetmap.de/)
+## Tech
 
-Enlaces directos: `?mapa` (salta la bienvenida) y `?modo=noche`, `?modo=dia` o `?modo=todo`.
+- [Leaflet](https://leafletjs.com/) 1.9.4, **embedded in index.html** (no CDN dependency).
+- Street map with fallback providers: if one fails or takes longer than 7 s, the next one is used
+  (Esri World Street Map → OpenStreetMap DE → OSM France → OpenStreetMap). Night mode darkens the same map with a CSS filter.
+- Search: [Nominatim](https://nominatim.org/) · Walking routes: [OSRM](https://routing.openstreetmap.de/)
 
-## ⚠️ Prototipo
+## ⚠️ Prototype
 
-Los reportes de ejemplo son **datos simulados** y no reflejan estadísticas reales.
-Los reportes y votos nuevos se guardan solo en el navegador (localStorage). Para compartirlos entre usuarias hará falta un backend.
+The sample reports are **simulated data** and do not reflect real statistics.
+New reports and votes are stored only in the browser (localStorage). Sharing them between users will need a backend.

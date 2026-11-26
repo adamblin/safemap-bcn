@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="es" data-theme="light">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SafeMap BCN</title>
-<meta name="description" content="Mapa colaborativo y anónimo para moverte más segura por Barcelona.">
+<meta name="description" content="A collaborative, anonymous map to help women move around Barcelona more safely.">
 <meta name="theme-color" content="#5b21b6">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1015,36 +1015,36 @@ svg.leaflet-image-layer.leaflet-interactive path {
   </defs>
 </svg>
 
-<div id="map" role="application" aria-label="Mapa de seguridad de Barcelona"></div>
+<div id="map" role="application" aria-label="Barcelona safety map"></div>
 
 <header class="topbar">
   <div class="search">
     <span class="brand-mark" aria-hidden="true"><svg class="i"><use href="#i-shield"/></svg></span>
-    <label for="q" class="sr">Buscar un lugar en Barcelona</label>
-    <input id="q" type="search" placeholder="Buscar en Barcelona" autocomplete="off" enterkeyhint="search">
-    <button id="btnInfo" class="icon-btn" aria-label="Cómo funciona"><svg class="i"><use href="#i-info"/></svg></button>
+    <label for="q" class="sr">Search for a place in Barcelona</label>
+    <input id="q" type="search" placeholder="Search Barcelona" autocomplete="off" enterkeyhint="search">
+    <button id="btnInfo" class="icon-btn" aria-label="How it works"><svg class="i"><use href="#i-info"/></svg></button>
   </div>
-  <ul id="qResults" class="results hidden" role="listbox" aria-label="Resultados"></ul>
-  <div class="modes" id="modes" role="group" aria-label="Momento del día">
-    <button data-mode="auto" aria-pressed="true"><svg class="i"><use href="#i-clock"/></svg>Ahora</button>
-    <button data-mode="day" aria-pressed="false"><svg class="i"><use href="#i-sun"/></svg>Día</button>
-    <button data-mode="night" aria-pressed="false"><svg class="i"><use href="#i-moon"/></svg>Noche</button>
-    <button data-mode="all" aria-pressed="false"><svg class="i"><use href="#i-all"/></svg>Todo</button>
+  <ul id="qResults" class="results hidden" role="listbox" aria-label="Results"></ul>
+  <div class="modes" id="modes" role="group" aria-label="Time of day">
+    <button data-mode="auto" aria-pressed="true"><svg class="i"><use href="#i-clock"/></svg>Now</button>
+    <button data-mode="day" aria-pressed="false"><svg class="i"><use href="#i-sun"/></svg>Day</button>
+    <button data-mode="night" aria-pressed="false"><svg class="i"><use href="#i-moon"/></svg>Night</button>
+    <button data-mode="all" aria-pressed="false"><svg class="i"><use href="#i-all"/></svg>All</button>
   </div>
   <div id="mapStatus" class="status-bar hidden" role="status">
     <svg class="i"><use href="#i-alert"/></svg><span id="mapStatusText"></span>
-    <button id="mapRetry" class="link-btn">Reintentar</button>
+    <button id="mapRetry" class="link-btn">Retry</button>
   </div>
 </header>
 
 <div class="controls">
   <div class="ctrl-group">
-    <button id="zoomIn" class="zoom-only" aria-label="Acercar"><svg class="i"><use href="#i-plus"/></svg></button>
-    <button id="zoomOut" class="zoom-only" aria-label="Alejar"><svg class="i"><use href="#i-minus"/></svg></button>
-    <button id="btnLocate" aria-label="Ir a mi ubicación"><svg class="i"><use href="#i-locate"/></svg></button>
-    <button id="btnHeat" aria-label="Mostrar mapa de calor" aria-pressed="true"><svg class="i"><use href="#i-layers"/></svg></button>
+    <button id="zoomIn" class="zoom-only" aria-label="Zoom in"><svg class="i"><use href="#i-plus"/></svg></button>
+    <button id="zoomOut" class="zoom-only" aria-label="Zoom out"><svg class="i"><use href="#i-minus"/></svg></button>
+    <button id="btnLocate" aria-label="Go to my location"><svg class="i"><use href="#i-locate"/></svg></button>
+    <button id="btnHeat" aria-label="Hide heat map" aria-pressed="true"><svg class="i"><use href="#i-layers"/></svg></button>
   </div>
-  <a href="tel:112" class="sos" aria-label="Emergencias: llamar al 112"><svg class="i"><use href="#i-phone"/></svg>112</a>
+  <a href="tel:112" class="sos" aria-label="Emergency: call 112"><svg class="i"><use href="#i-phone"/></svg>112</a>
 </div>
 
 <section id="sheet" class="sheet hidden" role="dialog" aria-labelledby="sheetTitle">
@@ -1052,22 +1052,22 @@ svg.leaflet-image-layer.leaflet-interactive path {
   <div id="sheetBody"></div>
 </section>
 
-<div class="legend" id="legend" aria-label="Leyenda">
-  <div class="legend-title"><svg class="i" id="legendIcon"><use href="#i-clock"/></svg><span id="legendMode">Ahora</span></div>
+<div class="legend" id="legend" aria-label="Legend">
+  <div class="legend-title"><svg class="i" id="legendIcon"><use href="#i-clock"/></svg><span id="legendMode">Now</span></div>
   <div class="grad"></div>
-  <div class="grad-lbls"><span>Seguro</span><span>Medio</span><span>Inseguro</span></div>
+  <div class="grad-lbls"><span>Safe</span><span>Medium</span><span>Unsafe</span></div>
 </div>
 
 <div class="actions" id="actions">
-  <button id="btnRoute" class="pill"><svg class="i"><use href="#i-route"/></svg>Ruta segura</button>
-  <button id="btnReport" class="pill primary"><svg class="i"><use href="#i-plus"/></svg>Reportar zona</button>
+  <button id="btnRoute" class="pill"><svg class="i"><use href="#i-route"/></svg>Safe route</button>
+  <button id="btnReport" class="pill primary"><svg class="i"><use href="#i-plus"/></svg>Report an area</button>
 </div>
 
 <div id="hint" class="hint hidden" role="status">
   <p><svg class="i"><use href="#i-pin"/></svg><span id="hintText"></span></p>
   <div class="hint-actions">
-    <button id="hintMe" class="solid"><svg class="i sm"><use href="#i-locate"/></svg>Mi ubicación</button>
-    <button id="hintCancel" class="soft">Cancelar</button>
+    <button id="hintMe" class="solid"><svg class="i sm"><use href="#i-locate"/></svg>My location</button>
+    <button id="hintCancel" class="soft">Cancel</button>
   </div>
 </div>
 
@@ -1103,12 +1103,12 @@ function toast(msg, icon = 'check', ms = 3000) {
 }
 function timeAgo(ts) {
   const m = Math.round((Date.now() - ts) / 60000);
-  if (m < 1) return 'ahora mismo';
-  if (m < 60) return `hace ${m} min`;
-  const h = Math.round(m / 60); if (h < 24) return `hace ${h} h`;
-  const d = Math.round(h / 24); return d === 1 ? 'hace 1 día' : `hace ${d} días`;
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m} min ago`;
+  const h = Math.round(m / 60); if (h < 24) return `${h} h ago`;
+  const d = Math.round(h / 24); return d === 1 ? '1 day ago' : `${d} days ago`;
 }
-const fmtDist = m => m < 1000 ? `${Math.round(m / 10) * 10} m` : `${(m / 1000).toFixed(1).replace('.', ',')} km`;
+const fmtDist = m => m < 1000 ? `${Math.round(m / 10) * 10} m` : `${(m / 1000).toFixed(1)} km`;
 const fmtTime = s => { const m = Math.max(1, Math.round(s / 60)); return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min`; };
 async function fetchJSON(url, ms = 12000) {
   const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), ms);
@@ -1120,24 +1120,24 @@ async function fetchJSON(url, ms = 12000) {
    Modelo de datos
    ===================================================================== */
 const LEVELS = [
-  { name: 'Seguro', color: '#16a34a' },
-  { name: 'Precaución', color: '#eab308' },
-  { name: 'Inseguro', color: '#dc2626' }
+  { name: 'Safe', color: '#16a34a' },
+  { name: 'Caution', color: '#eab308' },
+  { name: 'Unsafe', color: '#dc2626' }
 ];
 const CATS = {
-  light: { t: 'Bien iluminado', l: 0 },
-  people: { t: 'Mucha gente', l: 0 },
-  shops: { t: 'Comercios abiertos', l: 0 },
-  dark: { t: 'Poca iluminación', l: 1 },
-  empty: { t: 'Calle vacía', l: 1 },
-  drunk: { t: 'Gente bebida o peleas', l: 1 },
-  catcall: { t: 'Acoso verbal', l: 2 },
-  followed: { t: 'Me siguieron', l: 2 },
-  theft: { t: 'Robo o intento', l: 2 },
-  other: { t: 'Otro motivo', l: -1 }
+  light: { t: 'Well lit', l: 0 },
+  people: { t: 'Lots of people', l: 0 },
+  shops: { t: 'Open shops', l: 0 },
+  dark: { t: 'Poor lighting', l: 1 },
+  empty: { t: 'Empty street', l: 1 },
+  drunk: { t: 'Drunk people or fights', l: 1 },
+  catcall: { t: 'Catcalling', l: 2 },
+  followed: { t: 'I was followed', l: 2 },
+  theft: { t: 'Theft or attempt', l: 2 },
+  other: { t: 'Other reason', l: -1 }
 };
-const COMMENTS = ['Calle muy oscura', 'Hay bastante ambiente', 'Pasé sola y bien', 'Grupo de hombres molestando',
-  'Mucha policía por la zona', 'Me sentí observada', 'Bares abiertos hasta tarde', 'No había nadie', '', '', '', ''];
+const COMMENTS = ['Very dark street', 'Quite lively', 'Walked alone and felt fine', 'Group of men harassing people',
+  'Lots of police around', 'I felt watched', 'Bars open late', 'Nobody around', '', '', '', ''];
 
 // PRNG con semilla para que los datos demo sean siempre los mismos
 function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
@@ -1262,8 +1262,8 @@ function loadBase(idx = 0) {
   base.idx = idx; base.ok = 0; base.err = 0; base.layer = null;
   if (idx >= PROVIDERS.length) {
     setStatus(navigator.onLine === false
-      ? 'Sin conexión: no se ve el mapa de calles, pero los colores de seguridad siguen aquí.'
-      : 'No se pudo cargar el mapa de calles.');
+      ? 'Offline: the street map can’t load, but the safety colours are still shown.'
+      : 'The street map couldn’t be loaded.');
     return;
   }
   const p = PROVIDERS[idx];
@@ -1347,23 +1347,23 @@ function drawMarkers() {
 }
 function popupHtml(id) {
   const r = allReports().find(x => x.id === id);
-  if (!r) return 'Este reporte ya no existe.';
+  if (!r) return 'This report no longer exists.';
   const lv = LEVELS[r.level], mine = !r.demo, v = votes[r.id];
-  const st = { verified: 'Verificado', pending: 'Pendiente', hidden: 'Oculto por la comunidad' }[r.status];
+  const st = { verified: 'Verified', pending: 'Pending', hidden: 'Hidden by the community' }[r.status];
   return `<div class="pop" data-id="${esc(r.id)}">
     <div class="pop-h"><span class="dot" style="background:${lv.color}"></span>${lv.name}</div>
-    <div class="pop-sub">${esc(CATS[r.cat]?.t || 'Otro motivo')}</div>
+    <div class="pop-sub">${esc(CATS[r.cat]?.t || 'Other reason')}</div>
     <div class="pop-meta">
-      <span>${ic(r.night ? 'moon' : 'sun')}${r.night ? 'De noche' : 'De día'}</span>
+      <span>${ic(r.night ? 'moon' : 'sun')}${r.night ? 'At night' : 'During the day'}</span>
       <span>${timeAgo(r.ts)}</span>
       <span class="status ${r.status}">${st}</span>
     </div>
-    <div class="pop-meta"><span>${ic('check')}${r.confirms} confirman</span><span>${ic('flag')}${r.flags} lo marcan falso</span></div>
+    <div class="pop-meta"><span>${ic('check')}${r.confirms} confirmed</span><span>${ic('flag')}${r.flags} flagged as fake</span></div>
     ${r.comment ? `<q>${esc(r.comment)}</q>` : ''}
     <div class="pop-actions">${mine
-      ? `<button data-act="delete">${ic('trash', 'sm')}Eliminar mi reporte</button>`
-      : `<button data-act="up" aria-pressed="${v === 'up'}">${ic('check', 'sm')}Confirmar</button>
-         <button data-act="down" aria-pressed="${v === 'down'}">${ic('flag', 'sm')}Es falso</button>`}
+      ? `<button data-act="delete">${ic('trash', 'sm')}Delete my report</button>`
+      : `<button data-act="up" aria-pressed="${v === 'up'}">${ic('check', 'sm')}Confirm</button>
+         <button data-act="down" aria-pressed="${v === 'down'}">${ic('flag', 'sm')}It’s fake</button>`}
     </div></div>`;
 }
 map.on('popupopen', e => {
@@ -1374,19 +1374,19 @@ map.on('popupopen', e => {
     const act = btn.dataset.act;
     if (act === 'delete') {
       userReports = userReports.filter(r => r.id !== id); store.set('safemap.reports', userReports);
-      map.closePopup(); refresh(); toast('Reporte eliminado', 'trash'); return;
+      map.closePopup(); refresh(); toast('Report deleted', 'trash'); return;
     }
     if (votes[id] === act) delete votes[id]; else votes[id] = act;
     store.set('safemap.votes', votes);
     const at = e.popup.getLatLng();
     refresh();
     L.popup(POP).setLatLng(at).setContent(popupHtml(id)).openOn(map);
-    if (votes[id] === 'up') toast('Gracias por confirmar', 'heart');
-    else if (votes[id] === 'down') toast('Marcado como posible falso', 'flag');
+    if (votes[id] === 'up') toast('Thanks for confirming', 'heart');
+    else if (votes[id] === 'down') toast('Flagged as possibly fake', 'flag');
   }));
 });
 
-const MODE_LABEL = { auto: () => `Ahora · ${isNightNow() ? 'noche' : 'día'}`, day: () => 'De día', night: () => 'De noche', all: () => 'Día y noche' };
+const MODE_LABEL = { auto: () => `Now · ${isNightNow() ? 'night' : 'day'}`, day: () => 'Daytime', night: () => 'Night-time', all: () => 'Day and night' };
 const MODE_ICON = { auto: 'clock', day: 'sun', night: 'moon', all: 'all' };
 function refresh() {
   recompute(); setBase(); heat.redraw(); drawMarkers();
@@ -1402,19 +1402,19 @@ map.on('zoomend moveend', debounce(drawMarkers, 120));
 let meMarker = null, meLatLng = null;
 function locate(fly = true) {
   return new Promise((res, rej) => {
-    if (!navigator.geolocation) { toast('Tu navegador no permite la geolocalización', 'alert'); return rej(); }
+    if (!navigator.geolocation) { toast('Your browser doesn’t support geolocation', 'alert'); return rej(); }
     $('#btnLocate').setAttribute('aria-busy', 'true');
     navigator.geolocation.getCurrentPosition(p => {
       $('#btnLocate').removeAttribute('aria-busy');
       meLatLng = L.latLng(p.coords.latitude, p.coords.longitude);
       const icon = L.divIcon({ className: '', html: '<div class="me-dot"></div>', iconSize: [18, 18], iconAnchor: [9, 9] });
       if (meMarker) meMarker.setLatLng(meLatLng); else meMarker = L.marker(meLatLng, { icon, interactive: false, keyboard: false }).addTo(map);
-      if (!L.latLngBounds([[41.31, 2.05], [41.47, 2.25]]).contains(meLatLng)) toast('Estás fuera de Barcelona: el mapa solo cubre la ciudad', 'info');
+      if (!L.latLngBounds([[41.31, 2.05], [41.47, 2.25]]).contains(meLatLng)) toast('You’re outside Barcelona: the map only covers the city', 'info');
       else if (fly) map.flyTo(meLatLng, 16);
       res(meLatLng);
     }, err => {
       $('#btnLocate').removeAttribute('aria-busy');
-      toast(err.code === 1 ? 'Permiso de ubicación denegado. Actívalo en el navegador.' : 'No se pudo obtener tu ubicación', 'alert', 4000);
+      toast(err.code === 1 ? 'Location permission denied. Enable it in your browser.' : 'Couldn’t get your location', 'alert', 4000);
       rej();
     }, { enableHighAccuracy: true, timeout: 10000 });
   });
@@ -1427,7 +1427,7 @@ $('#zoomOut').onclick = () => map.zoomOut();
    Búsqueda (Nominatim / OpenStreetMap)
    ===================================================================== */
 async function geocode(q) {
-  const data = await fetchJSON('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&accept-language=es&bounded=1&viewbox=2.05,41.47,2.25,41.31&q=' + encodeURIComponent(q));
+  const data = await fetchJSON('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&accept-language=en&bounded=1&viewbox=2.05,41.47,2.25,41.31&q=' + encodeURIComponent(q));
   return data.map(x => {
     const parts = x.display_name.split(',').map(s => s.trim());
     return { label: parts[0], sub: parts.slice(1, 4).join(', '), latlng: L.latLng(+x.lat, +x.lon) };
@@ -1438,18 +1438,18 @@ function autocomplete(input, list, onPick) {
   const run = debounce(async () => {
     const q = input.value.trim(), my = ++seq;
     if (q.length < 3) { list.classList.add('hidden'); return; }
-    list.innerHTML = '<li class="empty">Buscando…</li>'; list.classList.remove('hidden');
+    list.innerHTML = '<li class="empty">Searching…</li>'; list.classList.remove('hidden');
     try {
       const res = await geocode(q);
       if (my !== seq) return;
-      if (!res.length) { list.innerHTML = '<li class="empty">Nada encontrado en Barcelona. Prueba con calle y número.</li>'; return; }
+      if (!res.length) { list.innerHTML = '<li class="empty">Nothing found in Barcelona. Try a street and number.</li>'; return; }
       list.innerHTML = res.map((x, i) => `<li role="option" tabindex="0" data-i="${i}">${ic('pin')}<div>${esc(x.label)}<small>${esc(x.sub)}</small></div></li>`).join('');
       $$('li[data-i]', list).forEach(li => {
         const pick = () => { list.classList.add('hidden'); onPick(res[+li.dataset.i]); };
         li.onclick = pick; li.onkeydown = e => { if (e.key === 'Enter') pick(); };
       });
     } catch {
-      if (my === seq) list.innerHTML = '<li class="empty">No se pudo buscar. Revisa tu conexión.</li>';
+      if (my === seq) list.innerHTML = '<li class="empty">Search failed. Check your connection.</li>';
     }
   }, 400);
   input.addEventListener('input', run);
@@ -1467,8 +1467,8 @@ autocomplete($('#q'), $('#qResults'), place => {
   const lvl = levelOf(sampleAt(place.latlng.lat, place.latlng.lng).score);
   searchMarker = L.marker(place.latlng, { icon: placeIcon }).addTo(map).bindPopup(`<div class="pop">
     <div class="pop-h">${esc(place.label)}</div>
-    <div class="pop-meta"><span><span class="dot" style="width:10px;height:10px;border-radius:50%;background:${lvl == null ? '#94a3b8' : LEVELS[lvl].color}"></span>${lvl == null ? 'Sin reportes suficientes' : 'Zona: ' + LEVELS[lvl].name.toLowerCase()} (${MODE_LABEL[mode]().toLowerCase()})</span></div>
-    <div class="pop-actions"><button data-go>${ic('route', 'sm')}Ruta segura hasta aquí</button></div></div>`, POP);
+    <div class="pop-meta"><span><span class="dot" style="width:10px;height:10px;border-radius:50%;background:${lvl == null ? '#94a3b8' : LEVELS[lvl].color}"></span>${lvl == null ? 'Not enough reports' : 'Area: ' + LEVELS[lvl].name.toLowerCase()} (${MODE_LABEL[mode]().toLowerCase()})</span></div>
+    <div class="pop-actions"><button data-go>${ic('route', 'sm')}Safe route here</button></div></div>`, POP);
   searchMarker.on('popupopen', e => {
     const b = $('[data-go]', e.popup.getElement());
     if (b) b.onclick = () => { routeState.to = { label: place.label, latlng: place.latlng }; routeState.results = null; map.closePopup(); openRoute(); };
@@ -1493,7 +1493,7 @@ function closeSheet() {
   cancelPick();
   clearRouteLayers(); routeState.results = null;
 }
-const sheetHead = title => `<div class="sheet-head"><h2 id="sheetTitle">${title}</h2><button class="icon-btn" data-close aria-label="Cerrar">${ic('x')}</button></div>`;
+const sheetHead = title => `<div class="sheet-head"><h2 id="sheetTitle">${title}</h2><button class="icon-btn" data-close aria-label="Close">${ic('x')}</button></div>`;
 $('#sheet').addEventListener('click', e => { if (e.target.closest('[data-close]')) closeSheet(); });
 
 function startPick(text, handler, back = null) {
@@ -1526,7 +1526,7 @@ $('#hintMe').onclick = () => { const h = pickHandler; locate(false).then(ll => {
 let draft = null;
 $('#btnReport').onclick = () => {
   sheetKind = null;
-  startPick('Toca el mapa donde quieres reportar', ll => {
+  startPick('Tap the map where you want to report', ll => {
     draft = { lat: ll.lat, lng: ll.lng, level: null, cat: null, night: isNightNow(), comment: '' };
     renderReportSheet();
   });
@@ -1534,19 +1534,19 @@ $('#btnReport').onclick = () => {
 function renderReportSheet() {
   const d = draft;
   const cats = Object.entries(CATS).filter(([, c]) => d.level == null || c.l === d.level || c.l === -1);
-  openSheet('report', `${sheetHead('Reportar zona')}
-    <p class="lede">Cuéntanos cómo te sentiste en este punto.</p>
-    <h3>Sensación</h3>
+  openSheet('report', `${sheetHead('Report an area')}
+    <p class="lede">Tell us how you felt at this spot.</p>
+    <h3>How did it feel?</h3>
     <div class="levels">${LEVELS.map((l, i) => `<button class="lvl" data-lvl="${i}" aria-pressed="${d.level === i}" style="--c:${l.color}"><span class="swatch" style="background:${l.color}"></span>${l.name}</button>`).join('')}</div>
-    <h3>Motivo</h3>
+    <h3>Reason</h3>
     <div class="chips">${cats.map(([k, c]) => `<button class="chip" data-cat="${k}" aria-pressed="${d.cat === k}">${c.t}</button>`).join('')}</div>
-    <h3>Cuándo</h3>
-    <div class="seg"><button data-night="0" aria-pressed="${!d.night}">${ic('sun', 'sm')}De día</button><button data-night="1" aria-pressed="${d.night}">${ic('moon', 'sm')}De noche</button></div>
-    <h3><label for="rComment">Comentario <span style="color:var(--muted);font-weight:400">(opcional)</span></label></h3>
-    <textarea id="rComment" rows="2" maxlength="140" placeholder="Ej.: farolas apagadas en toda la calle">${esc(d.comment)}</textarea>
+    <h3>When</h3>
+    <div class="seg"><button data-night="0" aria-pressed="${!d.night}">${ic('sun', 'sm')}Daytime</button><button data-night="1" aria-pressed="${d.night}">${ic('moon', 'sm')}Night-time</button></div>
+    <h3><label for="rComment">Comment <span style="color:var(--muted);font-weight:400">(optional)</span></label></h3>
+    <textarea id="rComment" rows="2" maxlength="140" placeholder="e.g. street lights out along the whole street">${esc(d.comment)}</textarea>
     <div class="counter" id="rCount">${d.comment.length}/140</div>
-    <div class="note">${ic('lock')}<span><b>Totalmente anónimo.</b> Sin nombre, email ni cuenta. La posición se redondea a unos 10 m. Aparecerá como pendiente hasta que otras usuarias lo confirmen.</span></div>
-    <button class="btn" id="rSend" ${d.level == null || !d.cat ? 'disabled' : ''}>Enviar reporte</button>`);
+    <div class="note">${ic('lock')}<span><b>Completely anonymous.</b> No name, email or account. The location is rounded to about 10 m. It will show as pending until other users confirm it.</span></div>
+    <button class="btn" id="rSend" ${d.level == null || !d.cat ? 'disabled' : ''}>Send report</button>`);
   const body = $('#sheetBody');
   $('#rComment').oninput = e => { d.comment = e.target.value; $('#rCount').textContent = `${d.comment.length}/140`; };
   $$('[data-lvl]', body).forEach(b => b.onclick = () => { d.level = +b.dataset.lvl; if (d.cat && CATS[d.cat].l !== d.level && CATS[d.cat].l !== -1) d.cat = null; renderReportSheet(); });
@@ -1561,7 +1561,7 @@ function renderReportSheet() {
     userReports.push(r); store.set('safemap.reports', userReports);
     closeSheet(); refresh();
     map.flyTo([r.lat, r.lng], Math.max(map.getZoom(), 16));
-    toast('Gracias. Tu reporte anónimo está pendiente de verificación', 'heart', 4000);
+    toast('Thank you. Your anonymous report is pending verification', 'heart', 4000);
   };
 }
 
@@ -1573,7 +1573,7 @@ const ROUTE_COLORS = { g: '#16a34a', y: '#eab308', r: '#dc2626', u: '#94a3b8' };
 const pinIcon = (txt, color) => L.divIcon({ className: '', html: `<div class="pin" style="background:${color}">${txt}</div>`, iconSize: [30, 30], iconAnchor: [15, 15] });
 
 $('#btnRoute').onclick = () => {
-  if (!routeState.from && meLatLng) routeState.from = { label: 'Mi ubicación', latlng: meLatLng };
+  if (!routeState.from && meLatLng) routeState.from = { label: 'My location', latlng: meLatLng };
   openRoute();
 };
 function openRoute() { renderRouteSheet(); }
@@ -1584,31 +1584,31 @@ function renderRouteSheet() {
       <span class="dot" style="background:${color}"></span>
       <label for="f_${key}" class="sr">${ph}</label>
       <input id="f_${key}" value="${esc(s[key]?.label || '')}" placeholder="${ph}" autocomplete="off">
-      <button class="mini" data-pick="${key}" aria-label="Elegir ${ph.toLowerCase()} en el mapa">${ic('pin')}</button>
+      <button class="mini" data-pick="${key}" aria-label="Pick ${ph.toLowerCase()} on the map">${ic('pin')}</button>
       <ul class="results hidden" id="l_${key}"></ul></div>`;
   let out = '';
-  if (s.loading) out = '<h3>Buscando rutas a pie…</h3><div class="route-list"><div class="skeleton"></div><div class="skeleton"></div></div>';
-  else if (s.error) out = `<div class="note error">${ic('alert')}<span>No se pudo calcular la ruta. Comprueba tu conexión.</span><button class="link-btn" id="retryRoute">Reintentar</button></div>`;
+  if (s.loading) out = '<h3>Finding walking routes…</h3><div class="route-list"><div class="skeleton"></div><div class="skeleton"></div></div>';
+  else if (s.error) out = `<div class="note error">${ic('alert')}<span>Couldn’t calculate the route. Check your connection.</span><button class="link-btn" id="retryRoute">Retry</button></div>`;
   else if (s.results) {
-    out = `<h3>${s.results.length > 1 ? s.results.length + ' rutas a pie' : 'Ruta a pie'}</h3><div class="route-list">` + s.results.map((r, i) => {
+    out = `<h3>${s.results.length > 1 ? s.results.length + ' walking routes' : 'Walking route'}</h3><div class="route-list">` + s.results.map((r, i) => {
       const a = r.analysis, pct = a.safety, lvl = pct == null ? null : pct >= 66 ? 0 : pct >= 40 ? 1 : 2;
       const col = lvl == null ? 'var(--muted)' : ['var(--safe)', 'var(--mid)', 'var(--danger)'][lvl];
       return `<button class="route" data-route="${i}" aria-pressed="${i === s.sel}">
-        <div class="row"><span class="name">Ruta ${String.fromCharCode(65 + i)}${i === s.bestIdx && s.results.length > 1 ? '<span class="tag">Más segura</span>' : ''}</span>
+        <div class="row"><span class="name">Route ${String.fromCharCode(65 + i)}${i === s.bestIdx && s.results.length > 1 ? '<span class="tag">Safest</span>' : ''}</span>
           <span class="score" style="color:${col}">${pct == null ? '–' : pct + '%'}</span></div>
-        <div class="row meta"><span>${fmtTime(r.duration)} · ${fmtDist(r.distance)}</span><span>seguridad</span></div>
+        <div class="row meta"><span>${fmtTime(r.duration)} · ${fmtDist(r.distance)}</span><span>safety</span></div>
         <div class="mix" aria-hidden="true">${['g', 'y', 'r', 'u'].filter(k => a.share[k] > 0).map(k => `<span style="flex:${a.share[k]};background:${ROUTE_COLORS[k]}"></span>`).join('')}</div>
-        ${a.share.r > .05 ? `<div class="warn-line">${ic('alert', 'sm')}${Math.round(a.share.r * 100)}% del trayecto por zonas inseguras</div>` : ''}
+        ${a.share.r > .05 ? `<div class="warn-line">${ic('alert', 'sm')}${Math.round(a.share.r * 100)}% of the way through unsafe areas</div>` : ''}
       </button>`;
-    }).join('') + `</div><div class="note">${ic('info')}<span>Seguridad calculada con los reportes de <b>${MODE_LABEL[mode]().toLowerCase()}</b>. Los tramos grises no tienen datos.</span></div>`;
+    }).join('') + `</div><div class="note">${ic('info')}<span>Safety based on <b>${MODE_LABEL[mode]().toLowerCase()}</b> reports. Grey sections have no data.</span></div>`;
   }
-  openSheet('route', `${sheetHead('Ruta segura')}
+  openSheet('route', `${sheetHead('Safe route')}
     <div class="route-fields">
-      ${field('from', '#2563eb', 'Origen')}
-      ${field('to', '#5b21b6', 'Destino')}
-      <button class="swap" id="swap" aria-label="Intercambiar origen y destino">${ic('swap', 'sm')}</button>
+      ${field('from', '#2563eb', 'Start')}
+      ${field('to', '#5b21b6', 'Destination')}
+      <button class="swap" id="swap" aria-label="Swap start and destination">${ic('swap', 'sm')}</button>
     </div>
-    <button class="btn" id="calc" ${!s.from || !s.to || s.loading ? 'disabled' : ''}>${ic('route')}Buscar la ruta más segura</button>
+    <button class="btn" id="calc" ${!s.from || !s.to || s.loading ? 'disabled' : ''}>${ic('route')}Find the safest route</button>
     ${out}`);
 
   for (const key of ['from', 'to']) {
@@ -1619,8 +1619,8 @@ function renderRouteSheet() {
   $('#swap').onclick = () => { [s.from, s.to] = [s.to, s.from]; s.results = null; clearRouteLayers(); renderRouteSheet(); };
   $$('[data-pick]').forEach(b => b.onclick = () => {
     const key = b.dataset.pick;
-    startPick(key === 'from' ? 'Toca el mapa para elegir el origen' : 'Toca el mapa para elegir el destino', (ll, isMe) => {
-      s[key] = { label: isMe ? 'Mi ubicación' : `Punto en el mapa (${ll.lat.toFixed(4)}, ${ll.lng.toFixed(4)})`, latlng: ll };
+    startPick(key === 'from' ? 'Tap the map to choose the start' : 'Tap the map to choose the destination', (ll, isMe) => {
+      s[key] = { label: isMe ? 'My location' : `Point on map (${ll.lat.toFixed(4)}, ${ll.lng.toFixed(4)})`, latlng: ll };
       s.results = null; clearRouteLayers(); renderRouteSheet();
     }, renderRouteSheet);
   });
@@ -1708,19 +1708,19 @@ function openInfo() {
   const all = allReports();
   const verified = all.filter(r => r.status === 'verified').length;
   openSheet('info', `${sheetHead('SafeMap BCN')}
-    <p class="lede">Un mapa hecho entre todas para decidir por dónde ir en Barcelona y evitar las calles donde otras mujeres se han sentido inseguras.</p>
+    <p class="lede">A map built together to decide which way to go in Barcelona and avoid the streets where other women have felt unsafe.</p>
     <div class="grad" style="height:10px;margin-top:16px"></div>
-    <div class="grad-lbls"><span>Seguro</span><span>Precaución</span><span>Inseguro</span></div>
+    <div class="grad-lbls"><span>Safe</span><span>Caution</span><span>Unsafe</span></div>
     <dl class="key">
-      <dt>${ic('clock')}</dt><dd><b>Día o noche.</b> La sensación cambia con la hora; por defecto ves la de ahora.</dd>
-      <dt>${ic('route')}</dt><dd><b>Ruta segura.</b> Compara rutas a pie y te marca la más segura.</dd>
-      <dt>${ic('lock')}</dt><dd><b>Reportes anónimos.</b> Sin registro ni datos personales.</dd>
-      <dt>${ic('users')}</dt><dd><b>Moderados por la comunidad.</b> Un reporte cuenta del todo con 2 confirmaciones y se oculta si lo marcan como falso.</dd>
+      <dt>${ic('clock')}</dt><dd><b>Day or night.</b> How safe a place feels changes with the time; by default you see the current one.</dd>
+      <dt>${ic('route')}</dt><dd><b>Safe route.</b> Compares walking routes and highlights the safest.</dd>
+      <dt>${ic('lock')}</dt><dd><b>Anonymous reports.</b> No sign-up and no personal data.</dd>
+      <dt>${ic('users')}</dt><dd><b>Community moderated.</b> A report counts fully after 2 confirmations and is hidden if people flag it as fake.</dd>
     </dl>
-    <p class="figures"><b>${all.length}</b> reportes · <b>${verified}</b> verificados · <b>${userReports.length}</b> tuyos</p>
-    <div class="note warn">${ic('alert')}<span><b>Prototipo.</b> Los reportes de ejemplo son datos simulados y no reflejan estadísticas reales. Lo que reportes se guarda solo en este dispositivo.</span></div>
-    <div class="note">${ic('phone')}<span>En una emergencia llama al <b>112</b> con el botón rojo del mapa.</span></div>
-    <button class="btn" data-close>Ver el mapa</button>`);
+    <p class="figures"><b>${all.length}</b> reports · <b>${verified}</b> verified · <b>${userReports.length}</b> yours</p>
+    <div class="note warn">${ic('alert')}<span><b>Prototype.</b> The sample reports are simulated data and don’t reflect real statistics. Anything you report is saved only on this device.</span></div>
+    <div class="note">${ic('phone')}<span>In an emergency call <b>112</b> using the red button on the map.</span></div>
+    <button class="btn" data-close>See the map</button>`);
   store.set('safemap.onboarded', true);
 }
 $('#btnInfo').onclick = openInfo;
@@ -1737,7 +1737,7 @@ $('#btnHeat').onclick = () => {
   heatOn = !heatOn;
   heatOn ? heat.addTo(map) : map.removeLayer(heat);
   $('#btnHeat').setAttribute('aria-pressed', heatOn);
-  $('#btnHeat').setAttribute('aria-label', heatOn ? 'Ocultar mapa de calor' : 'Mostrar mapa de calor');
+  $('#btnHeat').setAttribute('aria-label', heatOn ? 'Hide heat map' : 'Show heat map');
 };
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
@@ -1746,12 +1746,13 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('click', e => { if (!e.target.closest('.topbar')) $('#qResults').classList.add('hidden'); });
 
-// Enlaces directos: ?modo=noche | dia | todo
-const urlMode = { noche: 'night', dia: 'day', todo: 'all' }[new URLSearchParams(location.search).get('modo')];
+// Direct links: ?mode=night | day | all (Spanish ?modo=noche | dia | todo also works)
+const qp = new URLSearchParams(location.search);
+const urlMode = { noche: 'night', dia: 'day', todo: 'all', night: 'night', day: 'day', all: 'all' }[qp.get('mode') || qp.get('modo')];
 if (urlMode) { mode = urlMode; $$('#modes button').forEach(x => x.setAttribute('aria-pressed', x.dataset.mode === mode)); }
 refresh();
 fixSize();
-if (!store.get('safemap.onboarded', false) && !/[?&]mapa/.test(location.search)) openInfo();
+if (!store.get('safemap.onboarded', false) && !/[?&](mapa|map)\b/.test(location.search)) openInfo();
 </script>
 </body>
 </html>
