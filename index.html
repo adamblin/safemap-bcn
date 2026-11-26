@@ -774,7 +774,14 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .results li .i { color: var(--muted); margin-top: 1px; }
   .results li:hover, .results li:focus-visible { background: var(--surface-2); outline: 0; }
   .results li small { display: block; color: var(--muted); font-weight: 400; font-size: 12.5px; margin-top: 1px; }
-  .results li.empty { cursor: default; color: var(--muted); font-weight: 400; }
+  .results li.empty { cursor: default; color: var(--muted); font-weight: 400; font-size: 13px; }
+  .results li.active { background: var(--surface-2); }
+  .results li b { font-weight: 700; color: var(--text); }
+  .results li > div { min-width: 0; }
+  .results li small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .searching { display: inline-flex; align-items: center; gap: 8px; }
+  .searching::before { content: ""; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--brand); animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   .modes {
     display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 8px; padding: 3px;
@@ -920,10 +927,14 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .route-fields { position: relative; display: grid; gap: 8px; margin-top: 10px; }
   .field { position: relative; display: flex; gap: 8px; align-items: center; }
   .field .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; margin: 0 4px; }
-  .field .results { position: absolute; left: 28px; right: 0; top: 100%; z-index: 5; margin-top: 4px; }
+  .field { flex-wrap: wrap; }
+  .field input { flex: 1; width: auto; min-width: 0; }
+  body:has(#qResults:not(.hidden)) .corner-logo { display: none; }
+  .field .results { position: static; flex-basis: 100%; margin: 4px 0 4px 28px; box-shadow: var(--shadow-1); border: 1px solid var(--line); }
+  .route-fields:has(.results:not(.hidden)) .swap { display: none; }
   .mini { flex: none; width: 44px; height: 44px; border: 1.5px solid var(--line); background: var(--bg); color: var(--muted); border-radius: 12px; display: grid; place-items: center; transition: background .15s, color .15s; }
   .mini:hover { background: var(--surface-2); color: var(--text); }
-  .swap { position: absolute; right: 52px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--bg); color: var(--muted); display: grid; place-items: center; z-index: 2; }
+  .swap { position: absolute; right: 52px; top: 48px; transform: translateY(-50%); width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--bg); color: var(--muted); display: grid; place-items: center; z-index: 2; }
   .swap:hover { color: var(--text); background: var(--surface-2); }
   .route-fields .field input { padding-right: 40px; }
 
@@ -1017,6 +1028,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></symbol>
     <symbol id="i-swap" viewBox="0 0 24 24"><path d="M7 4v16M3 8l4-4 4 4M17 20V4M21 16l-4 4-4-4"/></symbol>
     <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+    <symbol id="i-train" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14M9 21l-2-4M15 21l2-4M9 14h.01M15 14h.01"/></symbol>
+    <symbol id="i-road" viewBox="0 0 24 24"><path d="M5 21 9 3M19 21 15 3M12 5v2M12 11v2M12 17v2"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3Z"/><path d="M9 3v15M15 6v15"/></symbol>
     <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z"/></symbol>
   </defs>
 </svg>
@@ -1029,6 +1043,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <span class="brand-mark" aria-hidden="true"><svg class="i"><use href="#i-shield"/></svg></span>
     <label for="q" class="sr">Search for a place in Barcelona</label>
     <input id="q" type="search" placeholder="Search Barcelona" autocomplete="off" enterkeyhint="search">
+    <button id="qClear" class="icon-btn hidden" aria-label="Clear search"><svg class="i"><use href="#i-x"/></svg></button>
     <button id="btnInfo" class="icon-btn" aria-label="How it works"><svg class="i"><use href="#i-info"/></svg></button>
   </div>
   <ul id="qResults" class="results hidden" role="listbox" aria-label="Results"></ul>
@@ -1117,8 +1132,9 @@ function timeAgo(ts) {
 }
 const fmtDist = m => m < 1000 ? `${Math.round(m / 10) * 10} m` : `${(m / 1000).toFixed(1)} km`;
 const fmtTime = s => { const m = Math.max(1, Math.round(s / 60)); return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min`; };
-async function fetchJSON(url, ms = 12000) {
+async function fetchJSON(url, ms = 12000, signal) {
   const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), ms);
+  signal?.addEventListener('abort', () => ctl.abort());
   try { const r = await fetch(url, { signal: ctl.signal }); if (!r.ok) throw new Error(r.status); return await r.json(); }
   finally { clearTimeout(t); }
 }
@@ -1460,44 +1476,287 @@ $('#zoomIn').onclick = () => map.zoomIn();
 $('#zoomOut').onclick = () => map.zoomOut();
 
 /* =====================================================================
-   Search (Nominatim / OpenStreetMap)
+   Search
+   - Instant local suggestions for well-known Barcelona places (no network).
+   - Photon (komoot) for as-you-type search: handles partial words, missing
+     accents and typos. Nominatim is the fallback if Photon fails.
+   - Results are de-duplicated, noise is filtered, queries are cached and
+     stale requests are cancelled.
    ===================================================================== */
-async function geocode(q) {
-  const data = await fetchJSON('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&accept-language=en&bounded=1&viewbox=2.05,41.47,2.25,41.31&q=' + encodeURIComponent(q));
-  return data.map(x => {
-    const parts = x.display_name.split(',').map(s => s.trim());
-    return { label: parts[0], sub: parts.slice(1, 4).join(', '), latlng: L.latLng(+x.lat, +x.lon) };
+const BCN_BBOX = '2.05,41.31,2.25,41.47';
+const inBcn = ll => ll.lat > 41.31 && ll.lat < 41.47 && ll.lng > 2.05 && ll.lng < 2.25;
+
+// Accent-insensitive normalisation that keeps one output char per input char (so indexes line up for highlighting)
+const norm = s => [...String(s)].map(c => c.normalize('NFD').replace(/[̀-ͯ]/g, '')[0] || c).join('').toLowerCase();
+const tokens = q => norm(q).replace(/[^a-z0-9·' ]+/g, ' ').split(/\s+/).filter(Boolean);
+
+// [name, area, lat, lng, kind, aliases]
+const LANDMARKS = [
+  ['Plaça de Catalunya', 'Ciutat Vella', 41.3870, 2.1700, 'place', 'placa catalunya plaza cataluna catalonia square'],
+  ['Sagrada Família', 'Eixample', 41.4036, 2.1744, 'place', 'sagrada familia holy family basilica gaudi'],
+  ['Park Güell', 'Gràcia', 41.4145, 2.1527, 'place', 'parc guell parque gaudi'],
+  ['Casa Batlló', 'Passeig de Gràcia, Eixample', 41.3916, 2.1650, 'place', 'casa batllo gaudi'],
+  ['La Pedrera – Casa Milà', 'Passeig de Gràcia, Eixample', 41.3954, 2.1619, 'place', 'pedrera casa mila gaudi'],
+  ['La Rambla', 'Ciutat Vella', 41.3809, 2.1735, 'street', 'las ramblas les rambles'],
+  ['Passeig de Gràcia', 'Eixample', 41.3925, 2.1650, 'street', 'paseo de gracia'],
+  ['Rambla de Catalunya', 'Eixample', 41.3920, 2.1625, 'street', 'rambla cataluna'],
+  ['Avinguda Diagonal', 'Barcelona', 41.3960, 2.1600, 'street', 'diagonal avenida'],
+  ['Gran Via de les Corts Catalanes', 'Barcelona', 41.3858, 2.1640, 'street', 'gran via'],
+  ['Avinguda del Paral·lel', 'Poble-sec', 41.3748, 2.1650, 'street', 'parallel paralelo'],
+  ['Gothic Quarter (Barri Gòtic)', 'Ciutat Vella', 41.3833, 2.1767, 'area', 'barri gotic barrio gotico gothic'],
+  ['El Born', 'Ciutat Vella', 41.3851, 2.1823, 'area', 'born ribera'],
+  ['El Raval', 'Ciutat Vella', 41.3797, 2.1682, 'area', 'raval'],
+  ['Barceloneta Beach', 'Ciutat Vella', 41.3784, 2.1925, 'place', 'barceloneta playa platja beach'],
+  ['Parc de la Ciutadella', 'Ciutat Vella', 41.3881, 2.1873, 'place', 'ciutadella ciudadela park'],
+  ['Arc de Triomf', 'Eixample', 41.3910, 2.1806, 'place', 'arco de triunfo arc triomf'],
+  ['Montjuïc', 'Sants-Montjuïc', 41.3636, 2.1580, 'area', 'montjuic montjuich'],
+  ['Plaça d’Espanya', 'Sants-Montjuïc', 41.3750, 2.1491, 'place', 'placa espanya plaza espana spain square'],
+  ['Spotify Camp Nou', 'Les Corts', 41.3809, 2.1228, 'place', 'camp nou barca stadium estadi'],
+  ['Gràcia', 'Barcelona', 41.4036, 2.1564, 'area', 'gracia'],
+  ['Barcelona Sants Station', 'Sants', 41.3792, 2.1400, 'station', 'sants estacio estacion train'],
+  ['Estació de França', 'Ciutat Vella', 41.3843, 2.1838, 'station', 'estacion francia franca'],
+  ['Port Vell', 'Ciutat Vella', 41.3755, 2.1830, 'place', 'port vell puerto viejo harbour'],
+  ['La Boqueria Market', 'La Rambla', 41.3818, 2.1717, 'place', 'boqueria mercat mercado market'],
+  ['Plaça Universitat', 'Eixample', 41.3858, 2.1640, 'place', 'placa universitat plaza universidad'],
+  ['University of Barcelona (UB)', 'Gran Via, Eixample', 41.3866, 2.1640, 'place', 'universitat de barcelona universidad ub'],
+  ['Pompeu Fabra University (UPF)', 'Ciutadella campus', 41.3905, 2.1915, 'place', 'upf pompeu fabra universitat'],
+  ['Poble-sec', 'Sants-Montjuïc', 41.3741, 2.1631, 'area', 'poble sec pueblo seco'],
+  ['Poblenou', 'Sant Martí', 41.4007, 2.2000, 'area', 'poble nou pueblo nuevo'],
+  ['Plaça de les Glòries', 'Sant Martí', 41.4036, 2.1872, 'place', 'glories placa'],
+  ['Diagonal Mar', 'Sant Martí', 41.4098, 2.2165, 'area', 'diagonal mar'],
+  ['Parc del Fòrum', 'Sant Martí', 41.4109, 2.2216, 'place', 'forum'],
+  ['Sant Antoni Market', 'Eixample', 41.3786, 2.1620, 'place', 'sant antoni mercat san antonio'],
+  ['Hospital Clínic', 'Eixample', 41.3896, 2.1527, 'place', 'hospital clinic'],
+  ['Hospital de Sant Pau', 'Guinardó', 41.4113, 2.1744, 'place', 'sant pau san pablo hospital'],
+  ['MACBA', 'El Raval', 41.3833, 2.1667, 'place', 'museu art contemporani'],
+  ['Gran Teatre del Liceu', 'La Rambla', 41.3805, 2.1734, 'place', 'liceu liceo'],
+  ['Plaça Reial', 'Ciutat Vella', 41.3801, 2.1754, 'place', 'placa reial plaza real'],
+  ['Barcelona Cathedral', 'Barri Gòtic', 41.3840, 2.1762, 'place', 'catedral cathedral seu'],
+  ['Picasso Museum', 'El Born', 41.3852, 2.1809, 'place', 'museu picasso museo'],
+  ['Tibidabo', 'Sarrià-Sant Gervasi', 41.4225, 2.1186, 'place', 'tibidabo'],
+  ['Bunkers del Carmel', 'Horta-Guinardó', 41.4192, 2.1617, 'place', 'bunkers carmel turo rovira'],
+  ['Les Corts', 'Barcelona', 41.3858, 2.1306, 'area', 'les corts'],
+  ['Sarrià', 'Barcelona', 41.4005, 2.1218, 'area', 'sarria'],
+  ['Sants', 'Barcelona', 41.3752, 2.1350, 'area', 'sants'],
+  ['Eixample', 'Barcelona', 41.3888, 2.1590, 'area', 'ensanche eixample'],
+  ['Plaça del Sol', 'Gràcia', 41.4023, 2.1574, 'place', 'placa del sol plaza'],
+  ['Plaça de Sant Jaume', 'Barri Gòtic', 41.3826, 2.1771, 'place', 'placa sant jaume ajuntament'],
+  ['Passeig de Sant Joan', 'Eixample', 41.3960, 2.1745, 'street', 'paseo san juan'],
+  ['Via Laietana', 'Ciutat Vella', 41.3840, 2.1770, 'street', 'via layetana'],
+  ['Maremagnum', 'Port Vell', 41.3752, 2.1826, 'place', 'maremagnum mall'],
+  ['Hotel W Barcelona', 'Barceloneta', 41.3686, 2.1901, 'place', 'w hotel vela'],
+  ['Columbus Monument', 'La Rambla', 41.3758, 2.1778, 'place', 'colom colon mirador'],
+  ['Palau de la Música Catalana', 'Sant Pere', 41.3876, 2.1753, 'place', 'palau musica'],
+  ['Razzmatazz', 'Poblenou', 41.3977, 2.1912, 'place', 'razz club'],
+  ['Apolo', 'Poble-sec', 41.3744, 2.1695, 'place', 'sala apolo club']
+].map(([label, sub, lat, lng, kind, alias]) => ({ label, sub, latlng: L.latLng(lat, lng), kind, key: norm(label) + ' ' + alias }));
+
+// Small edit distance (typo tolerance), comparing the token with the start of the word
+function near(t, w) {
+  if (t.length < 5) return false;
+  const maxD = t.length >= 7 ? 2 : 1, s = w.slice(0, t.length + 1);
+  const dp = Array.from({ length: t.length + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= s.length; j++) dp[0][j] = j;
+  for (let i = 1; i <= t.length; i++) for (let j = 1; j <= s.length; j++)
+    dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (t[i - 1] === s[j - 1] ? 0 : 1));
+  return Math.min(dp[t.length][s.length], dp[t.length][Math.max(0, s.length - 1)]) <= maxD;
+}
+function localSearch(q) {
+  const tk = tokens(q); if (!tk.length) return [];
+  const scored = [];
+  for (const p of LANDMARKS) {
+    const words = p.key.split(/[\s'’·-]+/);
+    let score = 0, ok = true;
+    for (const t of tk) {
+      if (words.some(w => w === t)) score += 3;
+      else if (words.some(w => w.startsWith(t))) score += 2;
+      else if (t.length >= 4 && p.key.includes(t)) score += 1;
+      else if (words.some(w => near(t, w))) score += 1;
+      else { ok = false; break; }
+    }
+    if (ok) scored.push([score + (norm(p.label).startsWith(tk[0]) ? 2 : 0), p]);
+  }
+  return scored.sort((a, b) => b[0] - a[0]).slice(0, 4).map(x => x[1]);
+}
+
+// Types from OpenStreetMap that are never useful destinations
+const NOISE = new Set(['defibrillator', 'ticket', 'map', 'construction', 'vending_machine', 'bench', 'waste_basket', 'recycling',
+  'post_box', 'information', 'board', 'guidepost', 'bicycle_parking', 'parking_entrance', 'charging_station', 'atm', 'telephone',
+  'toilets', 'drinking_water', 'fire_hydrant', 'street_lamp', 'surveillance', 'motorcycle_parking', 'bicycle_rental', 'yes']);
+const STATION = new Set(['station', 'train_station', 'subway_entrance', 'halt', 'tram_stop']);
+
+function photonPlace(f) {
+  const p = f.properties, [lng, lat] = f.geometry.coordinates;
+  const street = [p.street, p.housenumber].filter(Boolean).join(' ');
+  const isStreet = p.type === 'street' || p.osm_key === 'highway';
+  const label = p.name || street || p.district || p.locality;
+  if (!label || (p.city && p.city !== 'Barcelona')) return null;
+  const area = [p.locality, p.district].filter((x, i, a) => x && a.indexOf(x) === i && x !== label).slice(0, 1).join('');
+  const sub = [p.name && street && street !== label ? street : null, area].filter(Boolean).join(' · ') || p.city || 'Barcelona';
+  const kind = STATION.has(p.osm_value) ? 'station' : isStreet ? 'street' : p.type === 'district' || p.type === 'locality' ? 'area' : 'place';
+  return { label, sub, latlng: L.latLng(lat, lng), kind, osm: p.osm_value, stop: p.osm_value === 'stop' || p.osm_value === 'bus_stop' || p.osm_value === 'platform' };
+}
+
+async function photon(q, signal) {
+  const c = map.getCenter();
+  const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=12&lang=en&lat=${c.lat.toFixed(4)}&lon=${c.lng.toFixed(4)}&location_bias_scale=0.4&bbox=${BCN_BBOX}`;
+  const data = await fetchJSON(url, 8000, signal);
+  return (data.features || []).map(photonPlace).filter(p => p && !NOISE.has(p.osm) && inBcn(p.latlng));
+}
+async function nominatim(q, signal) {
+  const data = await fetchJSON(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&accept-language=en&bounded=1&viewbox=2.05,41.47,2.25,41.31&q=${encodeURIComponent(q)}`, 8000, signal);
+  return data.filter(x => !x.address?.city || x.address.city === 'Barcelona').map(x => {
+    const a = x.address || {}, street = [a.road, a.house_number].filter(Boolean).join(' ');
+    const label = x.name || street || x.display_name.split(',')[0];
+    const sub = [x.name && street ? street : null, a.suburb || a.city_district].filter(Boolean).join(' · ') || 'Barcelona';
+    return { label, sub, latlng: L.latLng(+x.lat, +x.lon), kind: x.category === 'highway' ? 'street' : 'place' };
   });
 }
-function autocomplete(input, list, onPick) {
-  let seq = 0;
-  const run = debounce(async () => {
-    const q = input.value.trim(), my = ++seq;
-    if (q.length < 3) { list.classList.add('hidden'); return; }
-    list.innerHTML = '<li class="empty">Searching…</li>'; list.classList.remove('hidden');
-    try {
-      const res = await geocode(q);
-      if (my !== seq) return;
-      if (!res.length) { list.innerHTML = '<li class="empty">Nothing found in Barcelona. Try a street and number.</li>'; return; }
-      list.innerHTML = res.map((x, i) => `<li role="option" tabindex="0" data-i="${i}">${ic('pin')}<div>${esc(x.label)}<small>${esc(x.sub)}</small></div></li>`).join('');
-      $$('li[data-i]', list).forEach(li => {
-        const pick = () => { list.classList.add('hidden'); onPick(res[+li.dataset.i]); };
-        li.onclick = pick; li.onkeydown = e => { if (e.key === 'Enter') pick(); };
-      });
-    } catch {
-      if (my === seq) list.innerHTML = '<li class="empty">Search failed. Check your connection.</li>';
-    }
-  }, 400);
-  input.addEventListener('input', run);
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Escape') list.classList.add('hidden');
-    if (e.key === 'ArrowDown') { const f = $('li[data-i]', list); if (f) { e.preventDefault(); f.focus(); } }
+
+// Merge and remove duplicates: same name nearby, or the same street split into several segments
+function dedupe(list) {
+  const out = [];
+  for (const p of list) {
+    const n = norm(p.label);
+    const dup = out.find(o => norm(o.label) === n && (p.kind === 'street' && o.kind === 'street' || o.latlng.distanceTo(p.latlng) < 400));
+    if (!dup) out.push(p);
+  }
+  return out;
+}
+const searchCache = new Map();
+async function remoteSearch(q, signal) {
+  const key = norm(q).trim();
+  if (searchCache.has(key)) return searchCache.get(key);
+  let res = [];
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try { res = await photon(q, signal); break; }
+    catch (e) { if (signal.aborted) throw e; await new Promise(r => setTimeout(r, 500)); }
+  }
+  if (!res.length && q.length >= 4) res = await nominatim(q, signal);
+  // Real stations and named places before bus/metro stop duplicates
+  // Results whose name contains more of the typed words go first (stable), bus/metro stop duplicates last
+  const tk = tokens(q), hits = p => tk.filter(x => norm(p.label).includes(x)).length;
+  res = res.map((p, i) => [p, i]).sort((x, y) => (x[0].stop - y[0].stop) || (hits(y[0]) - hits(x[0])) || (x[1] - y[1])).map(x => x[0]);
+  res = dedupe(res).slice(0, 6);
+  searchCache.set(key, res);
+  return res;
+}
+
+// Recent searches (per device)
+const recent = {
+  get: () => store.get('safemap.recent', []).map(r => ({ ...r, latlng: L.latLng(r.lat, r.lng), kind: 'recent' })),
+  add(p) {
+    if (p.kind === 'me') return;
+    const list = store.get('safemap.recent', []).filter(r => r.label !== p.label);
+    list.unshift({ label: p.label, sub: p.sub || '', lat: p.latlng.lat, lng: p.latlng.lng });
+    store.set('safemap.recent', list.slice(0, 5));
+  }
+};
+
+const KIND_ICON = { station: 'train', street: 'road', area: 'map', recent: 'clock', me: 'locate', place: 'pin' };
+function highlight(label, q) {
+  const n = norm(label), mark = new Array(label.length).fill(false);
+  for (const t of tokens(q)) {
+    let i = -1;
+    while ((i = n.indexOf(t, i + 1)) !== -1) { if (i === 0 || /[\s'’·(-]/.test(n[i - 1])) { for (let k = i; k < i + t.length; k++) mark[k] = true; break; } }
+  }
+  let html = '', open = false;
+  [...label].forEach((c, i) => {
+    if (mark[i] && !open) { html += '<b>'; open = true; }
+    if (!mark[i] && open) { html += '</b>'; open = false; }
+    html += esc(c);
   });
+  return html + (open ? '</b>' : '');
+}
+
+/* Autocomplete for any input + <ul>. opts.withMe adds a "My location" option. */
+function autocomplete(input, list, onPick, opts = {}) {
+  let items = [], active = -1, ctl = null, seq = 0, pickWhenReady = false, loading = false;
+  const meItem = () => ({ label: 'My location', sub: meLatLng ? 'Use your current position' : 'Uses your device’s GPS', kind: 'me' });
+
+  function render(q, note) {
+    if (!items.length && !note) { list.classList.add('hidden'); return; }
+    list.innerHTML = items.map((p, i) => `<li role="option" id="${list.id}_${i}" data-i="${i}" aria-selected="${i === active}" class="${i === active ? 'active' : ''}">
+        ${ic(KIND_ICON[p.kind] || 'pin')}<div>${q ? highlight(p.label, q) : esc(p.label)}<small>${esc(p.sub || '')}</small></div></li>`).join('')
+      + (note ? `<li class="empty">${note}</li>` : '');
+    list.classList.remove('hidden');
+    input.setAttribute('aria-activedescendant', active >= 0 ? `${list.id}_${active}` : '');
+    if (list.closest('.sheet')) list.scrollIntoView({ block: 'nearest' });
+    $$('li[data-i]', list).forEach(li => {
+      li.onmousedown = e => e.preventDefault(); // keep focus in the input
+      li.onclick = () => choose(+li.dataset.i);
+    });
+  }
+  async function choose(i) {
+    const p = items[i]; if (!p) return;
+    list.classList.add('hidden'); pickWhenReady = false;
+    if (p.kind === 'me') {
+      try { const ll = await locate(false); onPick({ label: 'My location', latlng: ll, kind: 'me' }); } catch { /* toast already shown */ }
+      return;
+    }
+    recent.add(p);
+    onPick(p);
+  }
+  function showDefault() {
+    items = [...(opts.withMe ? [meItem()] : []), ...recent.get()];
+    active = -1;
+    render('', items.length ? null : null);
+  }
+  const runRemote = debounce(async (q, my) => {
+    ctl?.abort(); ctl = new AbortController();
+    try {
+      const res = await remoteSearch(q, ctl.signal);
+      if (my !== seq) return;
+      loading = false;
+      const local = localSearch(q);
+      items = dedupe([...local, ...res]).slice(0, 7);
+      if (opts.withMe && 'my location'.startsWith(norm(q))) items.unshift(meItem());
+      active = items.length ? Math.max(active, 0) : -1;
+      render(q, items.length ? null : 'No results in Barcelona. Try a street name and number, or a place.');
+      if (pickWhenReady && items.length) choose(0);
+    } catch (e) {
+      if (my !== seq || ctl.signal.aborted && e.name === 'AbortError') return;
+      loading = false;
+      render(q, items.length ? 'Online search unavailable — showing saved places.' : 'Search failed. Check your connection and try again.');
+    }
+  }, 220);
+
+  function onInput() {
+    const q = input.value.trim(), my = ++seq;
+    opts.onInput?.(q);
+    if (!q) { ctl?.abort(); loading = false; showDefault(); return; }
+    // Instant local suggestions while the online search runs
+    items = localSearch(q);
+    if (opts.withMe && 'my location'.startsWith(norm(q))) items.unshift(meItem());
+    active = items.length ? 0 : -1;
+    if (q.length < 2) { render(q, null); return; }
+    loading = true;
+    render(q, '<span class="searching">Searching…</span>');
+    runRemote(q, my);
+  }
+  input.addEventListener('input', onInput);
+  input.addEventListener('focus', () => { if (!input.value.trim()) showDefault(); else if (items.length) render(input.value.trim()); });
+  input.addEventListener('blur', () => setTimeout(() => list.classList.add('hidden'), 150));
+  input.addEventListener('keydown', e => {
+    const n = items.length;
+    if (e.key === 'ArrowDown' && n) { e.preventDefault(); active = (active + 1) % n; render(input.value.trim(), loading ? '<span class="searching">Searching…</span>' : null); }
+    else if (e.key === 'ArrowUp' && n) { e.preventDefault(); active = (active - 1 + n) % n; render(input.value.trim(), loading ? '<span class="searching">Searching…</span>' : null); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (n && !loading) choose(active >= 0 ? active : 0);
+      else if (n && active >= 0 && localSearch(input.value).length) choose(active);
+      else pickWhenReady = true;
+    }
+    else if (e.key === 'Escape') { list.classList.add('hidden'); }
+  });
+  input.setAttribute('role', 'combobox');
+  input.setAttribute('aria-autocomplete', 'list');
+  input.setAttribute('aria-controls', list.id);
 }
 let searchMarker = null;
 const placeIcon = L.divIcon({ className: '', html: `<div class="place-pin"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3" fill="#fff"/></svg></div>`, iconSize: [34, 34], iconAnchor: [17, 32], popupAnchor: [0, -28] });
 autocomplete($('#q'), $('#qResults'), place => {
-  $('#q').value = place.label; $('#q').blur();
+  $('#q').value = place.label; $('#q').blur(); $('#qClear').classList.remove('hidden');
   map.flyTo(place.latlng, 17);
   if (searchMarker) map.removeLayer(searchMarker);
   const lvl = levelOf(sampleAt(place.latlng.lat, place.latlng.lng).score);
@@ -1649,8 +1908,8 @@ function renderRouteSheet() {
 
   for (const key of ['from', 'to']) {
     const input = $('#f_' + key);
-    autocomplete(input, $('#l_' + key), place => { s[key] = place; s.results = null; s.error = false; clearRouteLayers(); renderRouteSheet(); });
-    input.addEventListener('input', () => { s[key] = null; $('#calc').disabled = true; });
+    autocomplete(input, $('#l_' + key), place => { s[key] = place; s.results = null; s.error = false; clearRouteLayers(); renderRouteSheet(); },
+      { withMe: true, onInput: () => { s[key] = null; $('#calc').disabled = true; } });
   }
   $('#swap').onclick = () => { [s.from, s.to] = [s.to, s.from]; s.results = null; clearRouteLayers(); renderRouteSheet(); };
   $$('[data-pick]').forEach(b => b.onclick = () => {
@@ -1781,6 +2040,9 @@ document.addEventListener('keydown', e => {
   else if (sheetKind) closeSheet();
 });
 document.addEventListener('click', e => { if (!e.target.closest('.topbar')) $('#qResults').classList.add('hidden'); });
+
+$('#q').addEventListener('input', () => $('#qClear').classList.toggle('hidden', !$('#q').value));
+$('#qClear').onclick = () => { $('#q').value = ''; $('#qClear').classList.add('hidden'); $('#q').focus(); $('#q').dispatchEvent(new Event('input')); };
 
 // Direct links: ?mode=night | day | all (Spanish ?modo=noche | dia | todo also works)
 const qp = new URLSearchParams(location.search);
