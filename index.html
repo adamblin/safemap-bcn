@@ -1146,25 +1146,40 @@ function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = 
    DATOS DE DEMOSTRACIÓN: no reflejan estadísticas reales. */
 const DEMO_ZONES = [
   [41.3870, 2.1700, 0, 1, .003], [41.3925, 2.1650, 0, 0, .004], [41.3810, 2.1735, 0, 1, .002],
-  [41.3790, 2.1690, 1, 2, .002], [41.3825, 2.1770, 0, 1, .002], [41.3790, 2.1925, 0, 1, .003],
-  [41.3880, 2.1870, 0, 2, .002], [41.4030, 2.1570, 0, 0, .004], [41.3790, 2.1400, 0, 1, .003],
-  [41.3740, 2.1620, 0, 1, .003], [41.3640, 2.1580, 0, 2, .004], [41.4036, 2.1744, 0, 0, .003],
-  [41.3880, 2.1550, 0, 0, .005], [41.4000, 2.2000, 0, 1, .004], [41.3780, 2.1620, 0, 0, .003],
-  [41.4100, 2.2160, 0, 1, .004], [41.3810, 2.1230, 0, 1, .004], [41.3860, 2.1640, 0, 0, .002],
-  [41.3910, 2.1806, 0, 1, .002], [41.4110, 2.2210, 1, 2, .003], [41.3955, 2.1590, 0, 0, .004],
-  [41.3985, 2.1460, 0, 0, .004], [41.4140, 2.1530, 0, 1, .003], [41.4180, 2.1820, 0, 1, .004],
-  [41.3700, 2.1500, 0, 1, .004], [41.3955, 2.1890, 0, 1, .003], [41.4060, 2.1880, 0, 1, .004]
+  [41.3790, 2.1690, 1, 2, .002], [41.3825, 2.1770, 0, 2, .002], [41.3790, 2.1925, 0, 2, .003],
+  [41.3880, 2.1870, 0, 2, .002], [41.4030, 2.1570, 0, 1, .004], [41.3790, 2.1400, 0, 2, .003],
+  [41.3740, 2.1620, 0, 2, .003], [41.3640, 2.1580, 0, 2, .004], [41.4036, 2.1744, 0, 1, .003],
+  [41.3880, 2.1550, 0, 1, .005], [41.4000, 2.2000, 0, 2, .004], [41.3780, 2.1620, 0, 1, .003],
+  [41.4100, 2.2160, 0, 2, .004], [41.3810, 2.1230, 0, 1, .004], [41.3860, 2.1640, 0, 0, .002],
+  [41.3910, 2.1806, 0, 2, .002], [41.4110, 2.2210, 1, 2, .003], [41.3955, 2.1590, 0, 0, .004],
+  [41.3985, 2.1460, 0, 1, .004], [41.4140, 2.1530, 0, 2, .003], [41.4180, 2.1820, 0, 2, .004],
+  [41.3700, 2.1500, 0, 2, .004], [41.3955, 2.1890, 0, 2, .003], [41.4060, 2.1880, 0, 1, .004],
+  [41.3850, 2.1820, 0, 2, .002], [41.3935, 2.1700, 0, 1, .003], [41.3830, 2.1580, 0, 2, .003],
+  [41.3975, 2.1790, 0, 2, .003], [41.3900, 2.1500, 0, 1, .003]
+];
+
+/* Corredores de ejemplo: avenidas anchas e iluminadas que de noche se marcan como seguras.
+   Sirven para que la "ruta segura" tenga alternativas con diferencias claras. */
+const DEMO_CORRIDORS = [
+  [[41.3870, 2.1696], [41.3915, 2.1650], [41.3960, 2.1605], [41.4000, 2.1565]],                 // Passeig de Gràcia
+  [[41.3866, 2.1683], [41.3910, 2.1637], [41.3953, 2.1592]],                                     // Rambla de Catalunya
+  [[41.3752, 2.1495], [41.3805, 2.1567], [41.3858, 2.1640], [41.3900, 2.1697], [41.3945, 2.1755], [41.3990, 2.1815], [41.4035, 2.1870]], // Gran Via
+  [[41.3925, 2.1430], [41.3945, 2.1520], [41.3960, 2.1600], [41.3985, 2.1660], [41.4005, 2.1720], [41.4035, 2.1870]], // Diagonal
+  [[41.3870, 2.1700], [41.3820, 2.1735], [41.3770, 2.1775]],                                     // La Rambla
+  [[41.3752, 2.1495], [41.3745, 2.1600], [41.3750, 2.1700], [41.3760, 2.1775]],                 // Paral·lel
+  [[41.3910, 2.1806], [41.3960, 2.1745], [41.4030, 2.1660]],                                     // Passeig de Sant Joan
+  [[41.3870, 2.1745], [41.3840, 2.1770], [41.3805, 2.1800]]                                      // Via Laietana
 ];
 
 function buildDemo() {
   const rnd = mulberry32(2026);
   const out = []; let n = 0;
   const pick = lvl => { const k = Object.keys(CATS).filter(c => CATS[c].l === lvl); return k[Math.floor(rnd() * k.length)]; };
-  const add = (lat, lng, lvl, night) => out.push({
+  const add = (lat, lng, lvl, night, confirms = Math.floor(rnd() * 7)) => out.push({
     id: 'demo' + (n++), lat, lng, level: lvl, night, cat: pick(lvl),
     comment: COMMENTS[Math.floor(rnd() * COMMENTS.length)],
     ts: Date.now() - Math.floor(rnd() * 45 * 864e5),
-    confirms: Math.floor(rnd() * 7), flags: Math.floor(rnd() * 2), demo: true
+    confirms, flags: Math.floor(rnd() * 2), demo: true
   });
   const jitter = lvl => rnd() < .2 ? Math.max(0, Math.min(2, lvl + (rnd() < .5 ? -1 : 1))) : lvl;
   for (const [lat, lng, d, nt, s] of DEMO_ZONES) {
@@ -1173,10 +1188,24 @@ function buildDemo() {
       add(lat + (rnd() - .5) * s * 2, lng + (rnd() - .5) * s * 2.6, jitter(night ? nt : d), night);
     }
   }
-  for (let i = 0; i < 140; i++) {
+  // Fondo: de día casi todo seguro; de noche mucho más amarillo y rojo
+  for (let i = 0; i < 220; i++) {
     const night = i % 2 === 1, r = rnd();
-    const lvl = night ? (r < .62 ? 0 : r < .95 ? 1 : 2) : (r < .9 ? 0 : 1);
+    const lvl = night ? (r < .25 ? 0 : r < .62 ? 1 : 2) : (r < .9 ? 0 : 1);
     add(41.368 + rnd() * .048, 2.128 + rnd() * .085, lvl, night);
+  }
+  // Corredores seguros: un punto cada ~60 m, verificados
+  for (const line of DEMO_CORRIDORS) {
+    for (let i = 0; i < line.length - 1; i++) {
+      const [a, b] = [line[i], line[i + 1]];
+      const steps = Math.max(1, Math.round(Math.hypot((b[0] - a[0]) * 111320, (b[1] - a[1]) * 83500) / 60));
+      for (let k = 0; k < steps; k++) {
+        const lat = a[0] + (b[0] - a[0]) * k / steps + (rnd() - .5) * .0002;
+        const lng = a[1] + (b[1] - a[1]) * k / steps + (rnd() - .5) * .0002;
+        add(lat, lng, rnd() < .9 ? 0 : 1, true, 3 + Math.floor(rnd() * 5));
+        if (k % 2 === 0) add(lat, lng, 0, false, 3 + Math.floor(rnd() * 5));
+      }
+    }
   }
   return out;
 }
