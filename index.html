@@ -962,51 +962,123 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .figures { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; margin-top: 16px; }
   .figures b { color: var(--text); }
 
-  /* ---------- Trusted circle & walk together ---------- */
-  .avatar { border-radius: 50%; color: #fff; font-weight: 700; display: grid; place-items: center; flex: none; font-size: 15px; }
-  .contacts { display: grid; gap: 6px; }
-  .contact { display: flex; align-items: center; gap: 12px; padding: 8px 4px 8px 10px; border: 1.5px solid var(--line); border-radius: var(--r-md); }
-  .contact > div { flex: 1; min-width: 0; }
-  .contact small { display: block; color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
-  .empty-state { display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: 13.5px; padding: 12px; border: 1.5px dashed var(--line); border-radius: var(--r-md); }
+  /* ---------- Trusted circle & walk together (safeHER brand) ---------- */
+  :root { --ink: #110a1c; --ink-2: #1d1230; --glow: #a855f7; --lav: #dccff7; }
+  .avatar { border-radius: 50%; color: #fff; font-weight: 700; display: grid; place-items: center; flex: none; line-height: 1; }
+  .avatar.more { background: var(--surface-3); color: var(--text); font-size: 11px; }
+  .stack { display: inline-flex; align-items: center; flex: none; }
+  .stack > * + * { margin-left: -10px; }
+  .stack .avatar, .stack .ghost { box-shadow: 0 0 0 2.5px var(--ring, var(--bg)); }
+  .ghost { width: 44px; height: 44px; border-radius: 50%; border: 2px dashed rgba(220, 207, 247, .55); }
+
+  .hero {
+    position: relative; overflow: hidden; color: #fff; border-radius: var(--r-lg); padding: 20px 18px 18px; margin-top: 6px; --ring: var(--ink);
+    background: radial-gradient(120% 120% at 100% 0%, rgba(168, 85, 247, .55) 0%, rgba(109, 40, 217, .28) 35%, rgba(17, 10, 28, 0) 68%), var(--ink);
+    box-shadow: 0 8px 24px rgba(17, 10, 28, .28), 0 2px 6px rgba(17, 10, 28, .2);
+  }
+  [data-theme="dark"] .hero { box-shadow: inset 0 0 0 1px rgba(168, 85, 247, .3), 0 8px 24px rgba(0, 0, 0, .45); }
+  .hero-faces { margin-bottom: 14px; }
+  .sheet .hero-title { font-size: 20px; font-weight: 700; line-height: 1.25; letter-spacing: -.01em; margin: 0; color: #fff; text-wrap: balance; }
+  .sheet .hero-sub { display: block; color: var(--lav); font-size: 14px; margin: 6px 0 0; }
+  .hero-actions { display: grid; gap: 8px; margin-top: 18px; }
+  .hero-actions .btn { margin-top: 0; }
+  .btn.glow { background: linear-gradient(180deg, #a855f7, #7c3aed); color: #fff; box-shadow: 0 6px 18px rgba(124, 58, 237, .45), inset 0 1px 0 rgba(255, 255, 255, .25); }
+  .btn.glow:hover:not(:disabled) { background: linear-gradient(180deg, #b26bf9, #8b4cf0); }
+  .btn.on-ink { background: rgba(255, 255, 255, .08); color: #fff; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16); }
+  .btn.on-ink:hover:not(:disabled) { background: rgba(255, 255, 255, .14); }
+  .hero .searching::before, .btn.glow .searching::before { border-color: rgba(255, 255, 255, .3); border-top-color: #fff; }
+
+  .next { padding: 16px 12px 12px; margin-top: 14px; }
+  .sheet .next .hero-title { font-size: 16px; padding: 0 6px 12px; }
+  .next-tile {
+    width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px; border: 0; border-radius: var(--r-md);
+    background: rgba(255, 255, 255, .07); color: #fff; text-align: left; transition: background .15s, transform .15s var(--ease);
+  }
+  .next-tile + .next-tile { margin-top: 8px; }
+  .next-tile:hover { background: rgba(255, 255, 255, .13); }
+  .next-tile:active { transform: scale(.985); }
+  .tile-ic { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; flex: none; background: linear-gradient(180deg, #a855f7, #7c3aed); box-shadow: 0 4px 12px rgba(124, 58, 237, .45); }
+  .tile-txt { flex: 1; min-width: 0; }
+  .tile-txt b { display: block; font-size: 15px; }
+  .tile-txt small { display: block; color: var(--lav); font-size: 12.5px; line-height: 1.35; margin-top: 2px; }
+  .chev { width: 18px; height: 18px; color: var(--lav); flex: none; }
+
+  .ticket .eta b { display: block; font-size: 44px; line-height: 1.05; letter-spacing: -.03em; font-weight: 700; margin: 4px 0; font-variant-numeric: tabular-nums; }
+  .legs { list-style: none; margin: 18px 0 0; padding: 0; position: relative; display: grid; gap: 14px; font-weight: 600; font-size: 14.5px; }
+  .legs::before { content: ""; position: absolute; left: 5px; top: 12px; bottom: 12px; width: 2px; background: rgba(220, 207, 247, .35); }
+  .legs li { display: flex; align-items: center; gap: 12px; position: relative; }
+  .pt { width: 12px; height: 12px; border-radius: 50%; flex: none; box-shadow: 0 0 0 3px var(--ink); }
+  .pt.a { background: #60a5fa; }
+  .pt.b { background: var(--glow); }
+  .hero-note { display: flex; gap: 8px; align-items: flex-start; color: var(--lav); font-size: 13px; margin: 16px 0 0 !important; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, .12); }
+  .hero-note .i { margin-top: 2px; }
+
+  .msg-preview { font-size: 13.5px; line-height: 1.5; padding: 12px 14px; border-radius: var(--r-md); background: var(--surface-2); color: var(--text); word-break: break-word; }
+  .targets { display: grid; margin-top: 6px; }
+  .target, .contact { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
+  .target + .target, .contact + .contact { border-top: 1px solid var(--line); }
+  .t-who, .contact > div { flex: 1; min-width: 0; }
+  .t-who b, .contact b { display: block; font-size: 15px; }
+  .t-who small, .contact small { display: block; color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  .send {
+    height: 38px; padding: 0 14px; display: inline-flex; align-items: center; border-radius: 12px; font-size: 13.5px; font-weight: 600;
+    text-decoration: none; color: var(--text); box-shadow: inset 0 0 0 1.5px var(--line); transition: background .15s, filter .15s;
+  }
+  .send:hover { background: var(--surface-2); }
+  .send.wa { background: linear-gradient(180deg, #a855f7, #7c3aed); color: #fff; box-shadow: 0 4px 12px rgba(124, 58, 237, .35); }
+  .send.wa:hover { filter: brightness(1.08); }
+  .quiet-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .text-btn { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; color: var(--brand); font-weight: 600; font-size: 14px; padding: 8px 10px; border-radius: 10px; transition: background .15s; }
+  .text-btn:hover { background: var(--brand-soft); }
+  .text-btn.back { margin: 14px auto 0; display: flex; }
+
+  .contacts { display: grid; }
+  .empty-state { display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: 13.5px; padding: 12px; border: 1.5px dashed var(--line); border-radius: var(--r-md); margin-top: 6px; }
   .count { color: var(--muted); font-weight: 400; font-size: 12.5px; margin-left: 4px; font-variant-numeric: tabular-nums; }
-  .add-contact { display: grid; gap: 8px; margin-top: 10px; }
+  .add-row {
+    display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 8px; padding: 13px 14px; border: 1.5px dashed var(--line);
+    border-radius: var(--r-md); background: none; color: var(--brand); font-weight: 600; font-size: 14.5px; transition: background .15s, border-color .15s;
+  }
+  .add-row:hover { background: var(--brand-soft); border-color: var(--brand); }
+  .add-contact { display: grid; gap: 8px; margin-top: 10px; padding: 14px; border-radius: var(--r-md); background: var(--surface-2); }
   .add-contact input { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; padding: 11px 12px; font: inherit; font-size: 15px; background: var(--bg); color: var(--text); }
   .add-contact input:focus { border-color: var(--focus); outline: none; }
-  .add-contact .btn { margin-top: 0; }
-  .row-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
-  .row-btns .btn { margin-top: 0; font-size: 14px; }
-  .msg-preview { font-size: 13px; line-height: 1.5; padding: 12px; border-radius: var(--r-sm); background: var(--brand-soft); color: var(--text); word-break: break-word; }
-  .targets { display: grid; gap: 6px; margin-top: 10px; }
-  .target { display: flex; align-items: center; gap: 10px; }
-  .t-name { flex: 1; font-weight: 600; font-size: 14px; }
-  .mini-btn { border: 1.5px solid var(--line); background: var(--bg); color: var(--text); border-radius: 10px; padding: 7px 12px; font-size: 13px; font-weight: 600; text-decoration: none; transition: background .15s; }
-  .mini-btn:hover { background: var(--surface-2); }
-  .trip-card { border: 1.5px solid var(--line); border-radius: var(--r-md); padding: 12px 14px; display: grid; gap: 6px; font-size: 14px; }
-  .trip-line { display: flex; align-items: center; gap: 10px; font-weight: 600; }
-  .trip-line .dot { width: 10px; height: 10px; border-radius: 50%; }
-  .trip-meta { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; margin-top: 4px; font-variant-numeric: tabular-nums; }
-  .trip-meta b { color: var(--text); }
+  .add-contact .btn { margin-top: 2px; }
+
   .trip-bar .i { color: var(--brand); }
   .trip-bar.late { background: color-mix(in srgb, var(--danger) 14%, var(--bg)); }
   .trip-bar.late .i { color: var(--danger); }
   .link-btn.call { color: var(--danger); text-decoration: none; }
-  @media (max-width: 759px) { body:has(#sheet:not(.hidden)) .corner-logo { display: none; } }
+  .link-btn.call:hover { background: transparent; text-decoration: underline; text-underline-offset: 3px; }
   body:has(#tripBar:not(.hidden)) .corner-logo, body:has(#mapStatus:not(.hidden)) .corner-logo { display: none; }
-  .mates { display: grid; gap: 10px; }
-  .mate { border: 1.5px solid var(--line); border-radius: var(--r-md); padding: 12px; }
-  .mate .btn { margin-top: 10px; height: 44px; font-size: 14px; }
-  .mate-top { display: flex; gap: 12px; align-items: center; }
+
+  .mates { display: grid; gap: 10px; margin-top: 14px; }
+  .mate { border: 1.5px solid var(--line); border-radius: var(--r-lg); padding: 14px; background: var(--bg); transition: border-color .2s, box-shadow .2s; }
+  .mate.matched { border-color: var(--glow); box-shadow: 0 6px 18px rgba(17, 10, 28, .12); }
+  .mate-top { display: flex; gap: 12px; align-items: flex-start; }
+  .face { position: relative; flex: none; }
+  .badge { position: absolute; right: -2px; bottom: -2px; width: 19px; height: 19px; border-radius: 50%; background: var(--glow); color: #fff; display: grid; place-items: center; box-shadow: 0 0 0 2px var(--bg); }
+  .badge .i { width: 11px; height: 11px; stroke-width: 3; }
   .mate-info { flex: 1; min-width: 0; }
-  .mate-info b { font-size: 15px; }
-  .mate-info small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
-  .verified { display: inline-flex; align-items: center; gap: 3px; margin-left: 6px; font-size: 11.5px; font-weight: 600; color: var(--safe); vertical-align: 1px; }
-  .verified .i { width: 13px; height: 13px; }
-  .match { text-align: right; font-weight: 700; font-size: 18px; color: var(--brand); font-variant-numeric: tabular-nums; line-height: 1.1; }
-  .match small { display: block; font-size: 11px; font-weight: 500; color: var(--muted); }
-  .mate-meta { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; margin-top: 10px; }
-  .note.ok { background: color-mix(in srgb, var(--safe) 12%, var(--bg)); color: var(--text); margin-top: 10px; }
-  .note.ok .i { color: var(--safe); }
+  .mate-info b { font-size: 16px; }
+  .mate-info small { display: block; color: var(--muted); font-size: 13px; margin-top: 1px; }
+  .stats { font-variant-numeric: tabular-nums; }
+  .verified { color: var(--brand); font-weight: 600; }
+  .when { flex: none; font-size: 12.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--brand-soft); color: var(--brand); }
+  .overlap { display: grid; grid-template-columns: 1fr auto; gap: 6px 8px; margin-top: 14px; font-size: 13px; color: var(--muted); }
+  .overlap b { color: var(--text); font-variant-numeric: tabular-nums; }
+  .overlap i { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: linear-gradient(90deg, #7c3aed, #a855f7) 0 0 / var(--w) 100% no-repeat, var(--surface-3); }
+  .mate .btn { margin-top: 12px; height: 46px; font-size: 14.5px; }
+  .note.ok { background: color-mix(in srgb, var(--glow) 12%, var(--bg)); color: var(--text); margin-top: 12px; }
+  .note.ok .i { color: var(--brand); }
+
+  /* Circle button in the bottom bar */
+  .circle-pill { padding: 0 18px 0 12px; background: var(--ink); color: #fff; position: relative; --ring: var(--ink);
+    box-shadow: 0 0 0 2px rgba(168, 85, 247, .9), 0 6px 18px rgba(124, 58, 237, .45); }
+  .circle-pill:hover { background: var(--ink-2); }
+  #circleFace { display: inline-flex; }
+  .circle-pill.has-trip::after { content: ""; position: absolute; top: 3px; right: 5px; width: 11px; height: 11px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 2.5px var(--ink); }
+  @media (max-width: 419px) { .circle-label { display: none; } .circle-pill { width: 52px; padding: 0; justify-content: center; } }
 
   /* ---------- Popups and markers ---------- */
   .leaflet-container { font-family: var(--font); background: var(--map-bg); }
@@ -1079,6 +1151,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3Z"/><path d="M9 3v15M15 6v15"/></symbol>
     <symbol id="i-share" viewBox="0 0 24 24"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></symbol>
     <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
     <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z"/></symbol>
   </defs>
 </svg>
@@ -1118,7 +1191,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <button id="zoomOut" class="zoom-only" aria-label="Zoom out"><svg class="i"><use href="#i-minus"/></svg></button>
     <button id="btnLocate" aria-label="Go to my location"><svg class="i"><use href="#i-locate"/></svg></button>
     <button id="btnHeat" aria-label="Hide heat map" aria-pressed="true"><svg class="i"><use href="#i-layers"/></svg></button>
-    <button id="btnCircle" aria-label="Trusted circle: share your location"><svg class="i"><use href="#i-users"/></svg></button>
   </div>
   <a href="tel:112" class="sos" aria-label="Emergency: call 112"><svg class="i"><use href="#i-phone"/></svg>112</a>
 </div>
@@ -1135,8 +1207,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
 </div>
 
 <div class="actions" id="actions">
+  <button id="btnCircle" class="pill circle-pill" aria-label="Trusted circle: share your location or trip"><span id="circleFace"></span><span class="circle-label">Circle</span></button>
   <button id="btnRoute" class="pill"><svg class="i"><use href="#i-route"/></svg>Safe route</button>
-  <button id="btnReport" class="pill primary"><svg class="i"><use href="#i-plus"/></svg>Report an area</button>
+  <button id="btnReport" class="pill primary"><svg class="i"><use href="#i-plus"/></svg>Report</button>
 </div>
 
 <div id="hint" class="hint hidden" role="status">
@@ -1949,8 +2022,7 @@ function renderRouteSheet() {
         <div class="mix" aria-hidden="true">${['g', 'y', 'r', 'u'].filter(k => a.share[k] > 0).map(k => `<span style="flex:${a.share[k]};background:${ROUTE_COLORS[k]}"></span>`).join('')}</div>
         ${a.share.r > .05 ? `<div class="warn-line">${ic('alert', 'sm')}${Math.round(a.share.r * 100)}% of the way through unsafe areas</div>` : ''}
       </button>`;
-    }).join('') + `</div><div class="note">${ic('info')}<span>Safety based on <b>${MODE_LABEL[mode]().toLowerCase()}</b> reports. Grey sections have no data.</span></div>
-      <div class="row-btns"><button class="btn soft" id="shareTrip">${ic('share')}Share trip</button><button class="btn soft" id="walkTogether">${ic('users')}Walk together</button></div>`;
+    }).join('') + `</div>${nextSteps()}<div class="note">${ic('info')}<span>Safety based on <b>${MODE_LABEL[mode]().toLowerCase()}</b> reports. Grey sections have no data.</span></div>`;
   }
   openSheet('route', `${sheetHead('Safe route')}
     <div class="route-fields">
@@ -2091,20 +2163,29 @@ const digits = p => p.replace(/[^\d+]/g, '').replace(/^00/, '+');
 const AVATAR_COLORS = ['#7c3aed', '#db2777', '#0891b2', '#ea580c', '#16a34a', '#4f46e5', '#be123c', '#0d9488'];
 const avatar = (name, size = 36) => {
   const c = AVATAR_COLORS[[...name].reduce((a, ch) => a + ch.charCodeAt(0), 0) % AVATAR_COLORS.length];
-  return `<span class="avatar" style="width:${size}px;height:${size}px;background:${c}">${esc(name.trim()[0] || '?').toUpperCase()}</span>`;
+  return `<span class="avatar" style="width:${size}px;height:${size}px;font-size:${Math.round(size * .42)}px;background:${c}">${esc(name.trim()[0] || '?').toUpperCase()}</span>`;
 };
+const stack = (names, size = 32, max = 4, more = false) => `<span class="stack">${names.slice(0, max).map(n => avatar(n, size)).join('')}${more && names.length > max ? `<span class="avatar more" style="width:${size}px;height:${size}px">+${names.length - max}</span>` : ''}</span>`;
+const joinNames = n => n.length <= 1 ? (n[0] || '') : n.slice(0, -1).join(', ') + ' and ' + n[n.length - 1];
 
+function updateCirclePill() {
+  const el = $('#circleFace');
+  el.innerHTML = contacts.length ? stack(contacts.map(c => c.name), 26, 2) : ic('users');
+  $('#btnCircle').classList.toggle('has-trip', !!trip);
+}
+
+/* "Send to" block: one row per contact, then generic share / copy */
 function shareTargets(msg) {
   const enc = encodeURIComponent(msg);
   return `<div class="msg-preview">${esc(msg)}</div>
-    ${contacts.length ? `<div class="targets">${contacts.map((c, i) => `<div class="target">
-        ${avatar(c.name, 32)}<span class="t-name">${esc(c.name)}</span>
-        <a class="mini-btn" href="https://wa.me/${digits(c.phone).replace('+', '')}?text=${enc}" target="_blank" rel="noopener">WhatsApp</a>
-        <a class="mini-btn" href="sms:${esc(digits(c.phone))}?&body=${enc}">SMS</a></div>`).join('')}</div>`
-      : `<p class="lede" style="font-size:13px">Add trusted contacts to send this in one tap.</p>`}
-    <div class="row-btns">
-      ${navigator.share ? `<button class="btn soft" data-share>${ic('share')}Share via…</button>` : ''}
-      <button class="btn soft" data-copy>${ic('copy')}Copy message</button>
+    ${contacts.length ? `<div class="targets">${contacts.map(c => `<div class="target">
+        ${avatar(c.name, 40)}<div class="t-who"><b>${esc(c.name)}</b><small>${esc(c.phone)}</small></div>
+        <a class="send wa" href="https://wa.me/${digits(c.phone).replace('+', '')}?text=${enc}" target="_blank" rel="noopener">WhatsApp</a>
+        <a class="send" href="sms:${esc(digits(c.phone))}?&body=${enc}">SMS</a></div>`).join('')}</div>`
+      : `<div class="empty-state">${ic('users')}<span>Add people to your circle to send this in one tap.</span></div>`}
+    <div class="quiet-actions">
+      ${navigator.share ? `<button class="text-btn" data-share>${ic('share', 'sm')}Share via…</button>` : ''}
+      <button class="text-btn" data-copy>${ic('copy', 'sm')}Copy message</button>
     </div>`;
 }
 function bindShare(root, msg) {
@@ -2113,42 +2194,72 @@ function bindShare(root, msg) {
   if (c) c.onclick = () => (navigator.clipboard?.writeText(msg) || Promise.reject()).then(() => toast('Message copied', 'copy')).catch(() => toast('Couldn’t copy. Select the text and copy it.', 'alert'));
 }
 
-function openCircle(prefillMsg) {
+function openCircle(prefillMsg, opts = {}) {
+  const names = contacts.map(c => c.name);
+  const adding = opts.adding ?? !contacts.length;
   openSheet('circle', `${sheetHead('Trusted circle')}
-    <p class="lede">Share where you are with people you trust. Nothing is sent until you tap WhatsApp, SMS or Share.</p>
-    <h3>Your contacts <span class="count">${contacts.length}/5</span></h3>
-    <div class="contacts">${contacts.length ? contacts.map((c, i) => `<div class="contact">${avatar(c.name)}
+    <section class="hero">
+      <div class="hero-faces">${contacts.length ? stack(names, 44, 5) : '<span class="stack">' + '<span class="ghost"></span>'.repeat(3) + '</span>'}</div>
+      <p class="hero-title">${contacts.length ? `${esc(joinNames(names))} ${names.length === 1 ? 'is' : 'are'} in your circle` : 'Build your circle'}</p>
+      <p class="hero-sub">${contacts.length ? 'Let them know where you are, or that you got home, in one tap.' : 'Add up to 5 people you trust: a friend, your partner, family.'}</p>
+      <div class="hero-actions">
+        <button class="btn glow" id="shareLoc">${ic('locate')}Share my location</button>
+        <button class="btn on-ink" id="shareSafe">${ic('check')}I got home safe</button>
+      </div>
+    </section>
+    <div id="shareOut"></div>
+    <h3>People <span class="count">${contacts.length}/5</span></h3>
+    <div class="contacts">${contacts.map((c, i) => `<div class="contact">${avatar(c.name, 40)}
         <div><b>${esc(c.name)}</b><small>${esc(c.phone)}</small></div>
-        <button class="icon-btn" data-del="${i}" aria-label="Remove ${esc(c.name)}">${ic('trash', 'sm')}</button></div>`).join('')
-      : `<div class="empty-state">${ic('users')}<span>No contacts yet. Add a friend, partner or family member.</span></div>`}</div>
-    ${contacts.length < 5 ? `<form class="add-contact" id="addContact" autocomplete="off">
-        <label class="sr" for="cName">Name</label><input id="cName" placeholder="Name" maxlength="30" required>
-        <label class="sr" for="cPhone">Phone</label><input id="cPhone" type="tel" placeholder="Phone, e.g. +34 600 000 000" maxlength="20" required>
-        <button class="btn soft" type="submit">${ic('plus')}Add contact</button></form>` : ''}
-    <h3>Send a quick message</h3>
-    <div class="row-btns">
-      <button class="btn" id="shareLoc">${ic('locate')}Share my location</button>
-      <button class="btn soft" id="shareSafe">${ic('check')}I got home safe</button>
-    </div>
-    <div id="shareOut"></div>`);
+        <button class="icon-btn" data-del="${i}" aria-label="Remove ${esc(c.name)}">${ic('trash', 'sm')}</button></div>`).join('')}
+      ${contacts.length < 5 ? (adding
+        ? `<form class="add-contact" id="addContact" autocomplete="off">
+            <label class="sr" for="cName">Name</label><input id="cName" placeholder="Name" maxlength="30" required>
+            <label class="sr" for="cPhone">Phone</label><input id="cPhone" type="tel" inputmode="tel" placeholder="Phone, e.g. +34 600 000 000" maxlength="20" required>
+            <button class="btn" type="submit">${ic('plus')}Add to my circle</button></form>`
+        : `<button class="add-row" id="addRow">${ic('plus')}Add someone you trust</button>`) : ''}
+    </div>`);
   const body = $('#sheetBody');
-  $$('[data-del]', body).forEach(b => b.onclick = () => { contacts.splice(+b.dataset.del, 1); store.set('safemap.contacts', contacts); openCircle(); });
+  $$('[data-del]', body).forEach(b => b.onclick = () => { contacts.splice(+b.dataset.del, 1); store.set('safemap.contacts', contacts); updateCirclePill(); openCircle(); });
+  if ($('#addRow')) $('#addRow').onclick = () => { openCircle(prefillMsg, { adding: true }); $('#cName').focus(); };
   const form = $('#addContact');
   if (form) form.onsubmit = e => {
     e.preventDefault();
     const name = $('#cName').value.trim(), phone = $('#cPhone').value.trim();
     if (!name || digits(phone).replace('+', '').length < 6) { toast('Enter a name and a valid phone number', 'alert'); return; }
-    contacts.push({ name, phone }); store.set('safemap.contacts', contacts); openCircle();
-    toast(`${name} added to your trusted circle`, 'heart');
+    contacts.push({ name, phone }); store.set('safemap.contacts', contacts); updateCirclePill(); openCircle(prefillMsg, { adding: false });
+    toast(`${name} is now in your circle`, 'heart');
   };
-  const show = msg => { $('#shareOut').innerHTML = '<h3>Send it to</h3>' + shareTargets(msg); bindShare($('#shareOut'), msg); $('#shareOut').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); };
+  const show = msg => {
+    $('#shareOut').innerHTML = '<h3>Send it to</h3>' + shareTargets(msg);
+    bindShare($('#shareOut'), msg);
+    $('#shareOut').scrollIntoView({ block: 'start', behavior: 'smooth' });
+  };
   $('#shareLoc').onclick = () => {
-    $('#shareLoc').disabled = true;
+    const b = $('#shareLoc'); b.disabled = true; b.innerHTML = '<span class="searching">Finding you…</span>';
     locate(false).then(ll => show(`I'm sharing my location with you from SafeHer: ${mapLink(ll)} (sent at ${fmtClock(Date.now())}).`))
-      .catch(() => {}).finally(() => { if ($('#shareLoc')) $('#shareLoc').disabled = false; });
+      .catch(() => {}).finally(() => { if ($('#shareLoc')) { b.disabled = false; b.innerHTML = ic('locate') + 'Share my location'; } });
   };
   $('#shareSafe').onclick = () => { endTrip(); show(`I got home safe. Thanks for keeping an eye on me 💜`); };
   if (prefillMsg) show(prefillMsg);
+}
+
+/* ---- "Before you go" block shown under the route results ---- */
+function nextSteps() {
+  const mates = companions(), names = contacts.map(c => c.name);
+  return `<section class="hero next">
+    <p class="hero-title">Before you go</p>
+    <button class="next-tile" id="shareTrip">
+      <span class="tile-ic">${ic('share')}</span>
+      <span class="tile-txt"><b>Share your trip</b><small>${names.length ? `${esc(joinNames(names))} will see your route and arrival time` : 'Send your route and arrival time to someone you trust'}</small></span>
+      ${names.length ? stack(names, 30, 2) : ''}${ic('chev', 'chev')}
+    </button>
+    <button class="next-tile" id="walkTogether">
+      <span class="tile-ic">${ic('users')}</span>
+      <span class="tile-txt"><b>Walk together</b><small>${mates.length} women are heading your way</small></span>
+      ${stack(mates.map(m => m.name), 30, 2)}${ic('chev', 'chev')}
+    </button>
+  </section>`;
 }
 
 /* ---- Share a trip + arrival check-in ---- */
@@ -2158,28 +2269,29 @@ function openShareTrip() {
     + `Route: https://www.openstreetmap.org/directions?engine=fossgis_osrm_foot&route=${s.from.latlng.lat.toFixed(5)},${s.from.latlng.lng.toFixed(5)};${s.to.latlng.lat.toFixed(5)},${s.to.latlng.lng.toFixed(5)} . I'll text you when I arrive.`;
   trip = { to: s.to.label, eta, started: Date.now() }; store.set('safemap.trip', trip); renderTrip();
   openSheet('share', `${sheetHead('Share your trip')}
-    <div class="trip-card">
-      <div class="trip-line"><span class="dot" style="background:#2563eb"></span>${esc(s.from.label)}</div>
-      <div class="trip-line"><span class="dot" style="background:#5b21b6"></span>${esc(s.to.label)}</div>
-      <div class="trip-meta">${ic('clock', 'sm')}Arriving around <b>${fmtClock(eta)}</b> · ${fmtDist(r.distance)}${r.analysis.safety != null ? ` · ${r.analysis.safety}% safety` : ''}</div>
-    </div>
-    <p class="lede" style="font-size:13px">We'll remind you to check in when you arrive. If you don't, SafeHer will ask if you're OK.</p>
+    <section class="hero ticket">
+      <div class="eta"><span class="hero-sub">Arriving around</span><b>${fmtClock(eta)}</b>
+        <span class="hero-sub">${fmtTime(r.duration)} · ${fmtDist(r.distance)}${r.analysis.safety != null ? ` · ${r.analysis.safety}% safe` : ''}</span></div>
+      <ol class="legs"><li><span class="pt a"></span>${esc(s.from.label)}</li><li><span class="pt b"></span>${esc(s.to.label)}</li></ol>
+      <p class="hero-note">${ic('clock', 'sm')}We’ll check in with you at ${fmtClock(eta + 5 * 60e3)}. If you haven’t arrived, SafeHer will ask if you’re OK.</p>
+    </section>
     <h3>Send it to</h3>${shareTargets(msg)}
-    <button class="btn soft" id="backRoute">${ic('route')}Back to the route</button>
-    ${contacts.length ? '' : `<button class="btn" id="goCircle">${ic('users')}Add trusted contacts</button>`}`);
+    ${contacts.length ? '' : `<button class="btn" id="goCircle">${ic('users')}Add people to your circle</button>`}
+    <button class="text-btn back" id="backRoute">${ic('route', 'sm')}Back to the route</button>`);
   bindShare($('#sheetBody'), msg);
   $('#backRoute').onclick = renderRouteSheet;
-  if ($('#goCircle')) $('#goCircle').onclick = () => openCircle(msg);
+  if ($('#goCircle')) $('#goCircle').onclick = () => openCircle(msg, { adding: true });
 }
 function endTrip() { trip = null; store.set('safemap.trip', null); renderTrip(); }
 function renderTrip() {
   const bar = $('#tripBar');
+  updateCirclePill();
   if (!trip) { bar.classList.add('hidden'); return; }
   if (Date.now() - trip.eta > 3 * 3600e3) { endTrip(); return; } // forget very old trips
   const late = Date.now() > trip.eta + 5 * 60e3;
   bar.classList.toggle('late', late);
   $('#tripText').innerHTML = late
-    ? `<b>Are you OK?</b> You were due at ${fmtClock(trip.eta)}.`
+    ? `<b>Are you OK?</b> Due ${fmtClock(trip.eta)}`
     : `Trip shared · arriving ~${fmtClock(trip.eta)}`;
   $('#tripCall').classList.toggle('hidden', !late);
   bar.classList.remove('hidden');
@@ -2221,24 +2333,31 @@ function meetingPoint() {
 function openWalk() {
   const s = routeState, list = companions(), meet = meetingPoint();
   openSheet('walk', `${sheetHead('Walk together')}
-    <p class="lede">Women heading the same way as you, right now. Walking with someone is one of the best ways to feel safer at night.</p>
+    <section class="hero">
+      <div class="hero-faces">${stack(list.map(m => m.name), 44, 5)}</div>
+      <p class="hero-title">${list.length} women are heading your way</p>
+      <p class="hero-sub">From near ${esc(s.from.label)} towards ${esc(s.to.label)}, in the next 30 minutes. Walking with someone is one of the best ways to feel safer at night.</p>
+    </section>
     <div class="mates">${list.map(m => {
-      const st = walkState.req[m.id];
-      return `<div class="mate">
-        <div class="mate-top">${avatar(m.name, 44)}
-          <div class="mate-info"><b>${esc(m.name)}, ${m.age}</b>${m.verified ? `<span class="verified">${ic('shield', 'sm')}Verified</span>` : ''}
-            <small>${esc(m.about)} · ★ ${m.rating} · ${m.walks} walks</small></div>
-          <span class="match">${Math.round(m.overlap * 100)}%<small>same route</small></span></div>
-        <div class="mate-meta">${ic('clock', 'sm')}${m.leaves ? `Leaving in ${m.leaves} min` : 'Leaving now'}</div>
-        ${st === 'ok' ? `<div class="note ok">${ic('check')}<span><b>${esc(m.name)} accepted.</b> Meet at <b>${esc(meet)}</b>, a busy, well-lit spot. Share your trip with your trusted circle before you go.</span></div>
-            <button class="btn soft" data-sharetrip>${ic('share')}Share trip</button>`
-        : st === 'wait' ? `<button class="btn soft" disabled><span class="searching">Waiting for ${esc(m.name)}…</span></button>`
-        : `<button class="btn" data-ask="${esc(m.id)}" ${m.verified ? '' : 'disabled title="Only verified profiles can be contacted"'}>${ic('users')}${m.verified ? 'Ask to walk together' : 'Not verified yet'}</button>`}
-      </div>`;
+      const st = walkState.req[m.id], pct = Math.round(m.overlap * 100);
+      return `<article class="mate ${st === 'ok' ? 'matched' : ''}">
+        <div class="mate-top">
+          <span class="face">${avatar(m.name, 48)}${m.verified ? `<span class="badge" title="Verified">${ic('check')}</span>` : ''}</span>
+          <div class="mate-info"><b>${esc(m.name)}, ${m.age}</b><small>${esc(m.about)}</small>
+            <small class="stats">★ ${m.rating} · ${m.walks} walks${m.verified ? ' · <span class="verified">Verified</span>' : ''}</small></div>
+          <span class="when">${m.leaves ? `in ${m.leaves} min` : 'now'}</span>
+        </div>
+        <div class="overlap"><span>Same route</span><b>${pct}%</b><i style="--w:${pct}%"></i></div>
+        ${st === 'ok' ? `<div class="note ok">${ic('check')}<span><b>${esc(m.name)} said yes.</b> Meet at <b>${esc(meet)}</b>, a busy, well-lit spot.</span></div>
+            <button class="btn glow" data-sharetrip>${ic('share')}Share trip with your circle</button>`
+        : st === 'wait' ? `<button class="btn soft" disabled><span class="searching">Asking ${esc(m.name)}…</span></button>`
+        : m.verified ? `<button class="btn glow" data-ask="${esc(m.id)}">${ic('users')}Ask to walk together</button>`
+        : `<button class="btn soft" disabled>${ic('lock')}Waiting for verification</button>`}
+      </article>`;
     }).join('')}</div>
     <div class="note">${ic('lock')}<span><b>Safety first.</b> Only verified women can join. You only see first names, never addresses, and you always meet in a public place.</span></div>
     <div class="note warn">${ic('alert')}<span><b>Demo.</b> These profiles are simulated to show how the feature would work.</span></div>
-    <button class="btn soft" id="backRoute">${ic('route')}Back to the route</button>`);
+    <button class="text-btn back" id="backRoute">${ic('route', 'sm')}Back to the route</button>`);
   $$('[data-ask]').forEach(b => b.onclick = () => {
     const id = b.dataset.ask; walkState.req[id] = 'wait'; openWalk();
     setTimeout(() => { walkState.req[id] = 'ok'; if (sheetKind === 'walk') openWalk(); toast(`${id} wants to walk with you`, 'heart'); }, 2500);
