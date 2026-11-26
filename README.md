@@ -22,7 +22,7 @@ Abre `index.html` en el navegador, o la versión publicada en GitHub Pages.
   (Esri World Street Map → OpenStreetMap DE → OSM France → OpenStreetMap). El modo noche oscurece el mismo mapa con un filtro CSS.
 - Búsqueda: [Nominatim](https://nominatim.org/) · Rutas a pie: [OSRM](https://routing.openstreetmap.de/)
 
-Enlaces directos:  (salta la bienvenida) y .
+Enlaces directos: `?mapa` (salta la bienvenida) y `?modo=noche`, `?modo=dia` o `?modo=todo`.
 
 ## ⚠️ Prototipo
 
