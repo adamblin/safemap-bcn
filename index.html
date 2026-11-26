@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SafeMap BCN</title>
+<meta name="description" content="Mapa colaborativo y anónimo para moverte más segura por Barcelona.">
+<meta name="theme-color" content="#6d28d9">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root {
+    --brand: #6d28d9;
+    --brand-soft: #ede9fe;
+    --bg: #ffffff;
+    --bg-2: #f4f4f7;
+    --text: #18181b;
+    --muted: #6b7280;
+    --line: #e4e4e7;
+    --shadow: 0 2px 10px rgba(0,0,0,.15), 0 1px 3px rgba(0,0,0,.08);
+    --safe: #16a34a;
+    --mid: #eab308;
+    --danger: #dc2626;
+    --unknown: #64748b;
+    --radius: 16px;
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --brand: #a78bfa;
+      --brand-soft: #2e1065;
+      --bg: #1c1c22;
+      --bg-2: #27272f;
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --line: #3f3f46;
+      --shadow: 0 2px 12px rgba(0,0,0,.5);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; font-family: var(--font); color: var(--text); background: var(--bg); }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  #map { position: fixed; inset: 0; background: #dfe3e8; }
+  .hidden { display: none !important; }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    position: fixed; z-index: 1000; top: max(12px, env(safe-area-inset-top)); left: 12px; right: 12px;
+    max-width: 520px; margin: 0 auto;
+  }
+  .search {
+    display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 6px 0 14px;
+    background: var(--bg); border-radius: 24px; box-shadow: var(--shadow);
+  }
+  .search .logo { font-size: 20px; }
+  .search input {
+    flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-size: 16px; color: var(--text);
+  }
+  .icon-btn {
+    width: 36px; height: 36px; border: 0; border-radius: 50%; background: transparent; font-size: 17px;
+    display: grid; place-items: center; color: var(--muted);
+  }
+  .icon-btn:hover { background: var(--bg-2); }
+  .results {
+    list-style: none; margin: 6px 0 0; padding: 6px; background: var(--bg); border-radius: 14px; box-shadow: var(--shadow);
+  }
+  .results li { padding: 10px 12px; border-radius: 10px; cursor: pointer; font-size: 14px; }
+  .results li:hover, .results li:focus { background: var(--bg-2); outline: 0; }
+  .results li small { display: block; color: var(--muted); }
+  .chips { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; scrollbar-width: none; }
+  .chip {
+    flex: none; border: 0; padding: 8px 14px; border-radius: 18px; background: var(--bg); box-shadow: var(--shadow);
+    font-size: 14px; font-weight: 500;
+  }
+  .chip.active { background: var(--brand); color: #fff; }
+
+  /* ---------- Floating buttons ---------- */
+  .fabs-right {
+    position: fixed; z-index: 1000; right: 12px; top: 50%; transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .fab {
+    width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--bg); box-shadow: var(--shadow);
+    display: grid; place-items: center; font-size: 20px; text-decoration: none; color: var(--text);
+  }
+  .fab.off { opacity: .5; }
+  .fab.sos { background: var(--danger); color: #fff; font-weight: 800; font-size: 14px; }
+
+  .bottom-actions {
+    position: fixed; z-index: 1000; left: 0; right: 0; bottom: max(22px, env(safe-area-inset-bottom));
+    display: flex; justify-content: center; gap: 10px; padding: 0 12px; pointer-events: none;
+  }
+  .pill {
+    pointer-events: auto; border: 0; height: 50px; padding: 0 20px; border-radius: 25px; font-weight: 600; font-size: 15px;
+    background: var(--bg); box-shadow: var(--shadow);
+  }
+  .pill.primary { background: var(--brand); color: #fff; }
+
+  .legend {
+    position: fixed; z-index: 999; left: 12px; bottom: calc(max(22px, env(safe-area-inset-bottom)) + 64px);
+    background: var(--bg); border-radius: 12px; box-shadow: var(--shadow); padding: 8px 10px; font-size: 12px;
+  }
+  .legend .bar { width: 130px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--safe), var(--mid), var(--danger)); margin: 4px 0 2px; }
+  .legend .lbls { display: flex; justify-content: space-between; color: var(--muted); }
+  .legend b { font-weight: 600; }
+
+  .hint {
+    position: fixed; z-index: 1001; left: 12px; right: 12px; top: calc(max(12px, env(safe-area-inset-top)) + 110px);
+    max-width: 520px; margin: 0 auto; background: #111827; color: #fff; border-radius: 14px; padding: 12px 14px;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap; box-shadow: var(--shadow); font-size: 14px;
+  }
+  .hint span { flex: 1; min-width: 160px; }
+  .hint button { border: 0; border-radius: 10px; padding: 7px 12px; background: rgba(255,255,255,.15); color: #fff; font-size: 13px; }
+
+  /* ---------- Bottom sheet ---------- */
+  .sheet {
+    position: fixed; z-index: 1002; left: 0; right: 0; bottom: 0; max-height: 78vh; overflow-y: auto;
+    background: var(--bg); border-radius: 20px 20px 0 0; box-shadow: 0 -4px 24px rgba(0,0,0,.2);
+    padding: 8px 18px max(18px, env(safe-area-inset-bottom)); animation: up .22s ease-out;
+  }
+  @keyframes up { from { transform: translateY(40px); opacity: 0; } }
+  .sheet-handle { width: 40px; height: 4px; border-radius: 2px; background: var(--line); margin: 4px auto 10px; }
+  .sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .sheet h2 { font-size: 19px; margin: 0; }
+  .sheet h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 16px 0 8px; }
+  .sheet p { line-height: 1.5; margin: 8px 0; font-size: 14px; }
+  .sheet ul { padding-left: 20px; font-size: 14px; line-height: 1.6; }
+  .note { font-size: 12.5px; color: var(--muted); background: var(--bg-2); padding: 10px 12px; border-radius: 10px; line-height: 1.5; }
+  .warn { font-size: 12.5px; background: #fef3c7; color: #78350f; padding: 10px 12px; border-radius: 10px; line-height: 1.5; }
+  @media (min-width: 760px) {
+    .sheet { left: 16px; right: auto; bottom: 16px; width: 390px; border-radius: 20px; max-height: calc(100vh - 150px); }
+    .sheet-handle { display: none; }
+  }
+
+  .levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .lvl {
+    border: 2px solid var(--line); background: var(--bg); border-radius: 14px; padding: 12px 4px; font-weight: 600; font-size: 13.5px;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .lvl i { width: 22px; height: 22px; border-radius: 50%; display: block; }
+  .lvl.sel { border-color: currentColor; }
+  .cats { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cat { border: 1px solid var(--line); background: var(--bg); border-radius: 16px; padding: 7px 12px; font-size: 13px; }
+  .cat.sel { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .seg { display: inline-flex; background: var(--bg-2); border-radius: 12px; padding: 3px; }
+  .seg button { border: 0; background: transparent; padding: 7px 14px; border-radius: 10px; font-size: 13.5px; }
+  .seg button.sel { background: var(--bg); box-shadow: 0 1px 3px rgba(0,0,0,.15); font-weight: 600; }
+  textarea, .field input {
+    width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font: inherit; font-size: 15px;
+    background: var(--bg); color: var(--text); resize: vertical;
+  }
+  .btn {
+    width: 100%; height: 48px; border: 0; border-radius: 14px; background: var(--brand); color: #fff; font-weight: 600; font-size: 15px; margin-top: 14px;
+  }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.ghost { background: var(--bg-2); color: var(--text); }
+
+  .field { position: relative; display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
+  .field .tag { width: 26px; height: 26px; flex: none; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 12px; }
+  .field .results { position: absolute; left: 32px; right: 0; top: 100%; z-index: 5; margin-top: 2px; }
+  .field .mini { flex: none; width: 40px; height: 40px; border: 1px solid var(--line); background: var(--bg); border-radius: 12px; font-size: 16px; }
+
+  .route-card {
+    border: 2px solid var(--line); border-radius: 14px; padding: 12px; margin-top: 10px; cursor: pointer; background: var(--bg);
+    width: 100%; text-align: left;
+  }
+  .route-card.sel { border-color: var(--brand); background: var(--brand-soft); }
+  .route-card .row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .route-card .score { font-weight: 700; font-size: 18px; }
+  .route-card .meta { color: var(--muted); font-size: 13px; }
+  .badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--brand); color: #fff; margin-left: 6px; vertical-align: middle; }
+  .mix { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 8px; background: var(--line); }
+  .mix span { display: block; height: 100%; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat { background: var(--bg-2); border-radius: 12px; padding: 10px; text-align: center; }
+  .stat b { display: block; font-size: 20px; }
+  .stat small { color: var(--muted); font-size: 11.5px; }
+
+  /* ---------- Popups & markers ---------- */
+  .leaflet-popup-content-wrapper { border-radius: 14px; }
+  .leaflet-popup-content { margin: 12px 14px; font-family: var(--font); font-size: 13.5px; min-width: 210px; }
+  .pop-h { display: flex; align-items: center; gap: 6px; font-size: 14.5px; }
+  .pop-h .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .pop-meta { color: #6b7280; font-size: 12px; margin-top: 4px; line-height: 1.5; }
+  .pop p { margin: 8px 0 0 !important; font-style: italic; }
+  .pop-actions { display: flex; gap: 6px; margin-top: 10px; }
+  .pop-actions button { flex: 1; border: 1px solid #e4e4e7; background: #fff; color: #18181b; border-radius: 10px; padding: 7px 6px; font-size: 12.5px; }
+  .pop-actions button.on { background: #6d28d9; color: #fff; border-color: #6d28d9; }
+  .status { font-size: 10.5px; font-weight: 700; padding: 1px 7px; border-radius: 8px; text-transform: uppercase; letter-spacing: .03em; }
+  .status.verified { background: #dcfce7; color: #166534; }
+  .status.pending { background: #fef9c3; color: #854d0e; }
+  .status.hidden { background: #fee2e2; color: #991b1b; }
+  .me-dot { width: 18px; height: 18px; border-radius: 50%; background: #2563eb; border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(37,99,235,.25); }
+  .ab-pin { width: 28px; height: 28px; border-radius: 50%; color: #fff; font-weight: 800; display: grid; place-items: center; border: 3px solid #fff; box-shadow: var(--shadow); font-size: 13px; }
+
+  .toast {
+    position: fixed; z-index: 1100; left: 50%; bottom: 96px; transform: translateX(-50%); max-width: calc(100% - 32px);
+    background: #111827; color: #fff; padding: 11px 16px; border-radius: 12px; font-size: 14px; box-shadow: var(--shadow);
+  }
+  .leaflet-container { font-family: var(--font); }
+  .leaflet-control-attribution { font-size: 10px; }
+</style>
+</head>
+<body>
+<div id="map" aria-label="Mapa de seguridad de Barcelona"></div>
+
+<header class="topbar">
+  <div class="search">
+    <span class="logo" aria-hidden="true">🛡️</span>
+    <input id="q" type="search" placeholder="Buscar en Barcelona…" autocomplete="off" aria-label="Buscar lugar">
+    <button id="btnInfo" class="icon-btn" title="Información" aria-label="Información">ⓘ</button>
+  </div>
+  <ul id="qResults" class="results hidden"></ul>
+  <nav class="chips" id="modeChips" aria-label="Momento del día">
+    <button class="chip active" data-mode="auto">⏱ Ahora</button>
+    <button class="chip" data-mode="day">☀️ Día</button>
+    <button class="chip" data-mode="night">🌙 Noche</button>
+    <button class="chip" data-mode="all">Todo</button>
+  </nav>
+</header>
+
+<div class="fabs-right">
+  <button id="btnLocate" class="fab" title="Mi ubicación" aria-label="Mi ubicación">◎</button>
+  <button id="btnHeat" class="fab" title="Mostrar/ocultar mapa de calor" aria-label="Mapa de calor">▦</button>
+  <a href="tel:112" class="fab sos" title="Emergencias: llamar al 112" aria-label="Llamar al 112">112</a>
+</div>
+
+<div class="legend" id="legend">
+  <b id="legendMode">Ahora</b>
+  <div class="bar"></div>
+  <div class="lbls"><span>Seguro</span><span>Medio</span><span>Inseguro</span></div>
+</div>
+
+<div class="bottom-actions" id="bottomActions">
+  <button id="btnRoute" class="pill">🧭 Ruta segura</button>
+  <button id="btnReport" class="pill primary">＋ Reportar zona</button>
+</div>
+
+<div id="hint" class="hint hidden">
+  <span id="hintText"></span>
+  <button id="hintMe">📍 Mi ubicación</button>
+  <button id="hintCancel">Cancelar</button>
+</div>
+
+<section id="sheet" class="sheet hidden" role="dialog" aria-modal="false">
+  <div class="sheet-handle"></div>
+  <div id="sheetBody"></div>
+</section>
+
+<div id="toast" class="toast hidden" role="status"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+'use strict';
+
+/* =====================================================================
+   Utilidades
+   ===================================================================== */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* sin almacenamiento */ } }
+};
+const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+function toast(msg, ms = 2800) {
+  const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.add('hidden'), ms);
+}
+function timeAgo(ts) {
+  const m = Math.round((Date.now() - ts) / 60000);
+  if (m < 1) return 'ahora mismo';
+  if (m < 60) return `hace ${m} min`;
+  const h = Math.round(m / 60); if (h < 24) return `hace ${h} h`;
+  const d = Math.round(h / 24); return d === 1 ? 'hace 1 día' : `hace ${d} días`;
+}
+const fmtDist = m => m < 1000 ? `${Math.round(m / 10) * 10} m` : `${(m / 1000).toFixed(1)} km`;
+const fmtTime = s => { const m = Math.max(1, Math.round(s / 60)); return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min`; };
+
+/* =====================================================================
+   Modelo de datos
+   ===================================================================== */
+const LEVELS = [
+  { name: 'Seguro', color: '#16a34a' },
+  { name: 'Precaución', color: '#eab308' },
+  { name: 'Inseguro', color: '#dc2626' }
+];
+const CATS = {
+  light: { t: 'Bien iluminado', l: 0 },
+  people: { t: 'Mucha gente', l: 0 },
+  shops: { t: 'Comercios abiertos', l: 0 },
+  dark: { t: 'Poca iluminación', l: 1 },
+  empty: { t: 'Calle vacía', l: 1 },
+  drunk: { t: 'Gente bebida / peleas', l: 1 },
+  catcall: { t: 'Acoso verbal', l: 2 },
+  followed: { t: 'Me siguieron', l: 2 },
+  theft: { t: 'Robo o intento', l: 2 },
+  other: { t: 'Otro', l: -1 }
+};
+const COMMENTS = ['Calle muy oscura', 'Hay bastante ambiente', 'Pasé sola y bien', 'Grupo de hombres molestando',
+  'Mucha policía por la zona', 'Me sentí observada', 'Bares abiertos hasta tarde', 'No había nadie', '', '', '', ''];
+
+// PRNG con semilla para que los datos demo sean siempre los mismos
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+/* Zonas de ejemplo: [lat, lng, nivel de día, nivel de noche, dispersión]
+   ⚠️ DATOS DE DEMOSTRACIÓN: no reflejan estadísticas reales. */
+const DEMO_ZONES = [
+  [41.3870, 2.1700, 0, 1, .003], [41.3925, 2.1650, 0, 0, .004], [41.3810, 2.1735, 0, 1, .002],
+  [41.3790, 2.1690, 1, 2, .002], [41.3825, 2.1770, 0, 1, .002], [41.3790, 2.1925, 0, 1, .003],
+  [41.3880, 2.1870, 0, 2, .002], [41.4030, 2.1570, 0, 0, .004], [41.3790, 2.1400, 0, 1, .003],
+  [41.3740, 2.1620, 0, 1, .003], [41.3640, 2.1580, 0, 2, .004], [41.4036, 2.1744, 0, 0, .003],
+  [41.3880, 2.1550, 0, 0, .005], [41.4000, 2.2000, 0, 1, .004], [41.3780, 2.1620, 0, 0, .003],
+  [41.4100, 2.2160, 0, 1, .004], [41.3810, 2.1230, 0, 1, .004], [41.3860, 2.1640, 0, 0, .002],
+  [41.3910, 2.1806, 0, 1, .002], [41.4110, 2.2210, 1, 2, .003], [41.3955, 2.1590, 0, 0, .004],
+  [41.3985, 2.1460, 0, 0, .004], [41.4140, 2.1530, 0, 1, .003], [41.4180, 2.1820, 0, 1, .004],
+  [41.3700, 2.1500, 0, 1, .004], [41.3955, 2.1890, 0, 1, .003], [41.4060, 2.1880, 0, 1, .004]
+];
+
+function buildDemo() {
+  const rnd = mulberry32(2026);
+  const out = []; let n = 0;
+  const pick = lvl => { const k = Object.keys(CATS).filter(c => CATS[c].l === lvl); return k[Math.floor(rnd() * k.length)]; };
+  const add = (lat, lng, lvl, night) => out.push({
+    id: 'demo' + (n++), lat, lng, level: lvl, night, cat: pick(lvl),
+    comment: COMMENTS[Math.floor(rnd() * COMMENTS.length)],
+    ts: Date.now() - Math.floor(rnd() * 45 * 864e5),
+    confirms: Math.floor(rnd() * 7), flags: Math.floor(rnd() * 2), demo: true
+  });
+  const jitter = lvl => rnd() < .2 ? Math.max(0, Math.min(2, lvl + (rnd() < .5 ? -1 : 1))) : lvl;
+  for (const [lat, lng, d, nt, s] of DEMO_ZONES) {
+    for (let i = 0; i < 12; i++) {
+      const night = i % 2 === 1;
+      add(lat + (rnd() - .5) * s * 2, lng + (rnd() - .5) * s * 2.6, jitter(night ? nt : d), night);
+    }
+  }
+  // Fondo de reportes repartidos por el centro para que el mapa no quede vacío
+  for (let i = 0; i < 140; i++) {
+    const night = i % 2 === 1;
+    const r = rnd();
+    const lvl = night ? (r < .62 ? 0 : r < .95 ? 1 : 2) : (r < .9 ? 0 : 1);
+    add(41.368 + rnd() * .048, 2.128 + rnd() * .085, lvl, night);
+  }
+  return out;
+}
+
+const DEMO = buildDemo();
+let userReports = store.get('safemap.reports', []);
+let votes = store.get('safemap.votes', {});
+
+/* Moderación comunitaria:
+   - Un reporte nuevo queda "pendiente" (peso bajo) hasta tener 2 confirmaciones.
+   - Si 3+ personas lo marcan como falso y hay más "falso" que confirmaciones, se oculta. */
+function evaluate(r) {
+  const v = votes[r.id];
+  const confirms = r.confirms + (v === 'up' ? 1 : 0);
+  const flags = r.flags + (v === 'down' ? 1 : 0);
+  let status = 'verified', w = Math.min(1, .5 + .1 * confirms);
+  if (flags >= 3 && flags > confirms) { status = 'hidden'; w = 0; }
+  else if (confirms < 2) { status = 'pending'; w = .35; }
+  return { ...r, confirms, flags, status, w, score: r.level / 2 };
+}
+const allReports = () => [...DEMO, ...userReports].map(evaluate);
+
+/* =====================================================================
+   Modo día / noche
+   ===================================================================== */
+let mode = 'auto';
+const isNightNow = () => { const h = new Date().getHours(); return h >= 21 || h < 7; };
+const modeNight = () => mode === 'night' || (mode === 'auto' && isNightNow());
+const inMode = r => mode === 'all' ? true : r.night === modeNight();
+let active = [];
+function recompute() { active = allReports().filter(r => r.w > 0 && inMode(r)); }
+
+/* =====================================================================
+   Cálculo de seguridad en un punto (media ponderada por distancia)
+   ===================================================================== */
+const M_LAT = 111320, M_LNG = 111320 * Math.cos(41.39 * Math.PI / 180);
+const SIGMA = 140, RADIUS = SIGMA * 3, R2 = RADIUS * RADIUS, S2 = 2 * SIGMA * SIGMA;
+function sampleAt(lat, lng, list = active) {
+  let sw = 0, ss = 0;
+  for (const r of list) {
+    const dy = (r.lat - lat) * M_LAT, dx = (r.lng - lng) * M_LNG, d2 = dx * dx + dy * dy;
+    if (d2 > R2) continue;
+    const w = r.w * Math.exp(-d2 / S2);
+    sw += w; ss += w * r.score;
+  }
+  return sw ? { score: ss / sw, conf: sw } : { score: null, conf: 0 };
+}
+const STOPS = [[22, 163, 74], [234, 179, 8], [220, 38, 38]];
+function rgb(s) {
+  const t = Math.min(1.999, Math.max(0, s) * 2), i = Math.floor(t), f = t - i, a = STOPS[i], b = STOPS[i + 1];
+  return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+}
+
+/* =====================================================================
+   Mapa
+   ===================================================================== */
+const BCN = [41.3874, 2.1686];
+const map = L.map('map', {
+  zoomControl: false, minZoom: 12, maxZoom: 19,
+  maxBounds: [[41.25, 1.95], [41.55, 2.40]], maxBoundsViscosity: .8
+}).setView(BCN, 14);
+
+const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
+const tilesLight = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution, subdomains: 'abcd', maxZoom: 20 });
+const tilesDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution, subdomains: 'abcd', maxZoom: 20 });
+let baseLayer = null;
+function setBase() {
+  const want = modeNight() && mode !== 'all' ? tilesDark : tilesLight;
+  if (baseLayer === want) return;
+  if (baseLayer) map.removeLayer(baseLayer);
+  baseLayer = want.addTo(map);
+  baseLayer.bringToBack();
+}
+
+// Capa "mapa de calor": cada tile se pinta interpolando la puntuación de los reportes cercanos
+const SafetyLayer = L.GridLayer.extend({
+  createTile(coords) {
+    const size = this.getTileSize();
+    const tile = L.DomUtil.create('canvas', 'safety-tile');
+    tile.width = size.x; tile.height = size.y;
+    const origin = coords.scaleBy(size);
+    const nw = map.unproject(origin, coords.z), se = map.unproject(origin.add(size), coords.z);
+    const pLat = RADIUS / M_LAT, pLng = RADIUS / M_LNG;
+    const list = active.filter(r => r.lat < nw.lat + pLat && r.lat > se.lat - pLat && r.lng > nw.lng - pLng && r.lng < se.lng + pLng);
+    if (!list.length) return tile;
+
+    const N = 32, step = size.x / N;
+    const small = document.createElement('canvas'); small.width = N; small.height = N;
+    const sctx = small.getContext('2d'), img = sctx.createImageData(N, N);
+    for (let y = 0; y < N; y++) {
+      for (let x = 0; x < N; x++) {
+        const ll = map.unproject(origin.add(L.point((x + .5) * step, (y + .5) * step)), coords.z);
+        const s = sampleAt(ll.lat, ll.lng, list);
+        if (!s.conf) continue;
+        const [r, g, b] = rgb(s.score), i = (y * N + x) * 4;
+        img.data[i] = r; img.data[i + 1] = g; img.data[i + 2] = b;
+        img.data[i + 3] = Math.min(1, s.conf / .9) * 150;
+      }
+    }
+    sctx.putImageData(img, 0, 0);
+    const ctx = tile.getContext('2d');
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(small, 0, 0, size.x, size.y);
+    return tile;
+  }
+});
+const heat = new SafetyLayer({ opacity: 1, zIndex: 300 }).addTo(map);
+let heatOn = true;
+
+// Marcadores de reportes (visibles al acercarse)
+const reportLayer = L.layerGroup().addTo(map);
+function drawMarkers() {
+  reportLayer.clearLayers();
+  if (map.getZoom() < 16) return;
+  const b = map.getBounds().pad(.2);
+  for (const r of allReports()) {
+    if (!inMode(r) || !b.contains([r.lat, r.lng])) continue;
+    const m = L.circleMarker([r.lat, r.lng], {
+      radius: 7, color: '#fff', weight: 2, fillColor: LEVELS[r.level].color,
+      fillOpacity: r.status === 'hidden' ? .25 : r.status === 'pending' ? .55 : .95,
+      dashArray: r.status === 'pending' ? '3 3' : null
+    });
+    m.bindPopup(() => popupHtml(r.id), { maxWidth: 260 });
+    m.reportId = r.id;
+    m.addTo(reportLayer);
+  }
+}
+function popupHtml(id) {
+  const r = allReports().find(x => x.id === id);
+  if (!r) return 'Reporte eliminado';
+  const lv = LEVELS[r.level], mine = !r.demo, v = votes[r.id];
+  const st = { verified: 'Verificado', pending: 'Pendiente', hidden: 'Oculto (marcado falso)' }[r.status];
+  return `<div class="pop" data-id="${esc(r.id)}">
+    <div class="pop-h"><span class="dot" style="background:${lv.color}"></span><b>${lv.name}</b> · ${esc(CATS[r.cat]?.t || 'Otro')}</div>
+    <div class="pop-meta">${r.night ? '🌙 Noche' : '☀️ Día'} · ${timeAgo(r.ts)}<br>
+      <span class="status ${r.status}">${st}</span> ✔ ${r.confirms} · 🚩 ${r.flags}</div>
+    ${r.comment ? `<p>“${esc(r.comment)}”</p>` : ''}
+    <div class="pop-actions">${mine
+      ? `<button data-act="delete">🗑 Eliminar mi reporte</button>`
+      : `<button data-act="up" class="${v === 'up' ? 'on' : ''}">👍 Confirmar</button>
+         <button data-act="down" class="${v === 'down' ? 'on' : ''}">🚩 Es falso</button>`}
+    </div></div>`;
+}
+map.on('popupopen', e => {
+  const el = e.popup.getElement(), pop = $('.pop', el);
+  if (!pop) return;
+  const id = pop.dataset.id;
+  $$('[data-act]', pop).forEach(btn => btn.addEventListener('click', () => {
+    const act = btn.dataset.act;
+    if (act === 'delete') {
+      userReports = userReports.filter(r => r.id !== id); store.set('safemap.reports', userReports);
+      map.closePopup(); refresh(); toast('Reporte eliminado'); return;
+    }
+    votes[id] = votes[id] === act ? undefined : act;
+    if (!votes[id]) delete votes[id];
+    store.set('safemap.votes', votes);
+    const at = e.popup.getLatLng();
+    refresh();
+    L.popup({ maxWidth: 260 }).setLatLng(at).setContent(popupHtml(id)).openOn(map);
+    toast(act === 'up' ? 'Gracias por confirmar 💜' : 'Marcado como posible falso. La comunidad lo revisará.');
+  }));
+});
+
+function refresh() {
+  recompute(); setBase(); heat.redraw(); drawMarkers();
+  if (routeState.results) analyzeRoutes(), drawRoutes(), renderRouteSheet();
+  $('#legendMode').textContent = { auto: `Ahora (${isNightNow() ? 'noche' : 'día'})`, day: 'Día', night: 'Noche', all: 'Día y noche' }[mode];
+}
+map.on('zoomend moveend', debounce(drawMarkers, 120));
+
+/* =====================================================================
+   Ubicación
+   ===================================================================== */
+let meMarker = null, meLatLng = null;
+function locate(fly = true) {
+  return new Promise((res, rej) => {
+    if (!navigator.geolocation) { toast('Tu navegador no permite geolocalización'); return rej(); }
+    navigator.geolocation.getCurrentPosition(p => {
+      meLatLng = L.latLng(p.coords.latitude, p.coords.longitude);
+      const icon = L.divIcon({ className: '', html: '<div class="me-dot"></div>', iconSize: [18, 18], iconAnchor: [9, 9] });
+      if (meMarker) meMarker.setLatLng(meLatLng); else meMarker = L.marker(meLatLng, { icon, interactive: false }).addTo(map);
+      if (!L.latLngBounds([[41.31, 2.05], [41.47, 2.25]]).contains(meLatLng)) toast('Parece que estás fuera de Barcelona');
+      if (fly) map.flyTo(meLatLng, 16);
+      res(meLatLng);
+    }, () => { toast('No se pudo obtener tu ubicación'); rej(); }, { enableHighAccuracy: true, timeout: 10000 });
+  });
+}
+$('#btnLocate').onclick = () => locate().catch(() => {});
+
+/* =====================================================================
+   Búsqueda (Nominatim / OpenStreetMap)
+   ===================================================================== */
+async function geocode(q) {
+  const u = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&accept-language=es&bounded=1&viewbox=2.05,41.47,2.25,41.31&q=' + encodeURIComponent(q);
+  const r = await fetch(u);
+  if (!r.ok) throw new Error('geocode');
+  return (await r.json()).map(x => {
+    const parts = x.display_name.split(',').map(s => s.trim());
+    return { label: parts[0], sub: parts.slice(1, 4).join(', '), latlng: L.latLng(+x.lat, +x.lon) };
+  });
+}
+function autocomplete(input, list, onPick) {
+  const run = debounce(async () => {
+    const q = input.value.trim();
+    if (q.length < 3) { list.classList.add('hidden'); return; }
+    try {
+      const res = await geocode(q);
+      if (!res.length) { list.innerHTML = '<li><small>Sin resultados en Barcelona</small></li>'; list.classList.remove('hidden'); return; }
+      list.innerHTML = res.map((x, i) => `<li tabindex="0" data-i="${i}">${esc(x.label)}<small>${esc(x.sub)}</small></li>`).join('');
+      list.classList.remove('hidden');
+      $$('li[data-i]', list).forEach(li => li.onclick = () => { list.classList.add('hidden'); onPick(res[+li.dataset.i]); });
+    } catch { toast('Error buscando la dirección'); }
+  }, 450);
+  input.addEventListener('input', run);
+  input.addEventListener('keydown', e => { if (e.key === 'Escape') list.classList.add('hidden'); });
+}
+let searchMarker = null;
+autocomplete($('#q'), $('#qResults'), place => {
+  $('#q').value = place.label; $('#q').blur();
+  map.flyTo(place.latlng, 17);
+  if (searchMarker) map.removeLayer(searchMarker);
+  const s = sampleAt(place.latlng.lat, place.latlng.lng);
+  const lvl = s.score == null ? null : s.score < .34 ? 0 : s.score < .67 ? 1 : 2;
+  searchMarker = L.marker(place.latlng).addTo(map).bindPopup(`<b>${esc(place.label)}</b><br>
+    <span style="color:${lvl == null ? '#64748b' : LEVELS[lvl].color};font-weight:600">${lvl == null ? 'Sin datos suficientes' : 'Zona: ' + LEVELS[lvl].name}</span>
+    <div class="pop-actions"><button id="goHere">🧭 Ruta segura hasta aquí</button></div>`).openPopup();
+  searchMarker.on('popupopen', bindGoHere); bindGoHere();
+  function bindGoHere() {
+    setTimeout(() => { const b = $('#goHere'); if (b) b.onclick = () => { routeState.to = { label: place.label, latlng: place.latlng }; map.closePopup(); openRoute(); }; });
+  }
+});
+
+/* =====================================================================
+   Hoja inferior (sheet) y selección en el mapa
+   ===================================================================== */
+let pickHandler = null;
+function openSheet(html) {
+  $('#sheetBody').innerHTML = html;
+  $('#sheet').classList.remove('hidden');
+  $('#bottomActions').classList.add('hidden');
+  $('#sheet').scrollTop = 0;
+}
+function closeSheet() {
+  $('#sheet').classList.add('hidden');
+  $('#bottomActions').classList.remove('hidden');
+  cancelPick();
+}
+function sheetHead(title) { return `<div class="sheet-head"><h2>${title}</h2><button class="icon-btn" data-close aria-label="Cerrar">✕</button></div>`; }
+$('#sheet').addEventListener('click', e => { if (e.target.closest('[data-close]')) { closeSheet(); clearRouteLayers(); routeState.results = null; } });
+
+function startPick(text, handler, allowMe = true) {
+  pickHandler = handler;
+  $('#hintText').textContent = text;
+  $('#hintMe').classList.toggle('hidden', !allowMe);
+  $('#hint').classList.remove('hidden');
+  $('#sheet').classList.add('hidden');
+  $('#bottomActions').classList.add('hidden');
+  map.getContainer().style.cursor = 'crosshair';
+}
+function cancelPick() {
+  pickHandler = null;
+  $('#hint').classList.add('hidden');
+  map.getContainer().style.cursor = '';
+}
+map.on('click', e => {
+  $('#qResults').classList.add('hidden');
+  if (!pickHandler) return;
+  const h = pickHandler; cancelPick(); h(e.latlng);
+});
+$('#hintCancel').onclick = () => { const back = pickCancelBack; cancelPick(); back ? back() : closeSheet(); };
+$('#hintMe').onclick = () => { const h = pickHandler; locate().then(ll => { cancelPick(); h(ll); }).catch(() => {}); };
+let pickCancelBack = null;
+
+/* =====================================================================
+   Reportar (anónimo)
+   ===================================================================== */
+let draft = null;
+$('#btnReport').onclick = () => {
+  pickCancelBack = null;
+  startPick('Toca el mapa en el punto que quieres reportar', ll => {
+    draft = { lat: ll.lat, lng: ll.lng, level: null, cat: null, night: isNightNow(), comment: '' };
+    renderReportSheet();
+  });
+};
+function renderReportSheet() {
+  const d = draft;
+  const cats = Object.entries(CATS).filter(([, c]) => d.level == null || c.l === d.level || c.l === -1);
+  openSheet(`${sheetHead('Reportar zona')}
+    <h3>¿Cómo te sentiste aquí?</h3>
+    <div class="levels">${LEVELS.map((l, i) => `<button class="lvl ${d.level === i ? 'sel' : ''}" data-lvl="${i}" style="${d.level === i ? 'color:' + l.color : ''}"><i style="background:${l.color}"></i><span style="color:var(--text)">${l.name}</span></button>`).join('')}</div>
+    <h3>Motivo</h3>
+    <div class="cats">${cats.map(([k, c]) => `<button class="cat ${d.cat === k ? 'sel' : ''}" data-cat="${k}">${c.t}</button>`).join('')}</div>
+    <h3>¿Cuándo?</h3>
+    <div class="seg"><button data-night="0" class="${!d.night ? 'sel' : ''}">☀️ De día</button><button data-night="1" class="${d.night ? 'sel' : ''}">🌙 De noche</button></div>
+    <h3>Comentario (opcional)</h3>
+    <textarea id="rComment" rows="2" maxlength="140" placeholder="Ej.: farolas apagadas en toda la calle">${esc(d.comment)}</textarea>
+    <p class="note">🔒 <b>100 % anónimo.</b> No pedimos nombre, email ni cuenta. La posición se redondea a ~10 m.
+      Tu reporte aparecerá como <i>pendiente</i> hasta que otras usuarias lo confirmen.</p>
+    <button class="btn" id="rSend" ${d.level == null || !d.cat ? 'disabled' : ''}>Enviar reporte</button>`);
+  const body = $('#sheetBody');
+  $('#rComment').oninput = e => d.comment = e.target.value;
+  $$('[data-lvl]', body).forEach(b => b.onclick = () => { d.level = +b.dataset.lvl; if (d.cat && CATS[d.cat].l !== d.level && CATS[d.cat].l !== -1) d.cat = null; renderReportSheet(); });
+  $$('[data-cat]', body).forEach(b => b.onclick = () => { d.cat = b.dataset.cat; if (d.level == null && CATS[d.cat].l >= 0) d.level = CATS[d.cat].l; renderReportSheet(); });
+  $$('[data-night]', body).forEach(b => b.onclick = () => { d.night = b.dataset.night === '1'; renderReportSheet(); });
+  $('#rSend').onclick = () => {
+    const r = {
+      id: 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      lat: +d.lat.toFixed(4), lng: +d.lng.toFixed(4), level: d.level, cat: d.cat, night: d.night,
+      comment: d.comment.trim().slice(0, 140), ts: Date.now(), confirms: 0, flags: 0
+    };
+    userReports.push(r); store.set('safemap.reports', userReports);
+    closeSheet(); refresh();
+    map.flyTo([r.lat, r.lng], Math.max(map.getZoom(), 16));
+    toast('¡Gracias! Tu reporte anónimo está pendiente de verificación 💜', 3500);
+  };
+}
+
+/* =====================================================================
+   Ruta segura (OSRM a pie + puntuación de seguridad)
+   ===================================================================== */
+const routeState = { from: null, to: null, results: null, sel: 0, layers: null, loading: false };
+const ROUTE_COLORS = { g: '#16a34a', y: '#eab308', r: '#dc2626', u: '#94a3b8' };
+const pinIcon = (txt, color) => L.divIcon({ className: '', html: `<div class="ab-pin" style="background:${color}">${txt}</div>`, iconSize: [28, 28], iconAnchor: [14, 14] });
+
+$('#btnRoute').onclick = () => {
+  if (!routeState.from && meLatLng) routeState.from = { label: 'Mi ubicación', latlng: meLatLng };
+  openRoute();
+};
+function openRoute() { renderRouteSheet(); }
+
+function renderRouteSheet() {
+  const s = routeState;
+  const field = (key, tag, color, ph) => `<div class="field">
+      <span class="tag" style="background:${color}">${tag}</span>
+      <input id="f_${key}" value="${esc(s[key]?.label || '')}" placeholder="${ph}" autocomplete="off">
+      <button class="mini" data-pick="${key}" title="Elegir en el mapa">📍</button>
+      <ul class="results hidden" id="l_${key}"></ul></div>`;
+  let results = '';
+  if (s.loading) results = '<p class="note">Calculando rutas…</p>';
+  else if (s.results) {
+    results = '<h3>Rutas a pie</h3>' + s.results.map((r, i) => {
+      const a = r.analysis, pct = a.safety;
+      const best = i === s.bestIdx;
+      return `<button class="route-card ${i === s.sel ? 'sel' : ''}" data-route="${i}">
+        <div class="row"><span><b>Ruta ${String.fromCharCode(65 + i)}</b>${best ? '<span class="badge">MÁS SEGURA</span>' : ''}</span>
+          <span class="score" style="color:${pct == null ? 'var(--muted)' : pct >= 66 ? 'var(--safe)' : pct >= 40 ? '#ca8a04' : 'var(--danger)'}">${pct == null ? '—' : pct + '%'}</span></div>
+        <div class="row meta"><span>${fmtTime(r.duration)} · ${fmtDist(r.distance)}</span><span>seguridad</span></div>
+        <div class="mix">${['g', 'y', 'r', 'u'].map(k => `<span style="width:${(a.share[k] * 100).toFixed(1)}%;background:${ROUTE_COLORS[k]}"></span>`).join('')}</div>
+        ${a.share.r > .05 ? `<div class="meta" style="margin-top:6px">⚠️ ${Math.round(a.share.r * 100)}% del trayecto por zonas inseguras</div>` : ''}
+      </button>`;
+    }).join('') + `<p class="note">El % de seguridad se calcula con los reportes del modo <b>${$('#legendMode').textContent}</b>. Tramos grises = sin datos.</p>`;
+  }
+  openSheet(`${sheetHead('Ruta segura')}
+    ${field('from', 'A', '#2563eb', 'Origen')}
+    ${field('to', 'B', '#6d28d9', 'Destino')}
+    <button class="btn" id="calc" ${!s.from || !s.to ? 'disabled' : ''}>Buscar ruta más segura</button>
+    ${results}`);
+
+  for (const key of ['from', 'to']) {
+    const input = $('#f_' + key);
+    autocomplete(input, $('#l_' + key), place => { s[key] = place; s.results = null; renderRouteSheet(); });
+    input.addEventListener('input', () => { s[key] = null; $('#calc').disabled = true; });
+  }
+  $$('[data-pick]').forEach(b => b.onclick = () => {
+    const key = b.dataset.pick;
+    pickCancelBack = renderRouteSheet;
+    startPick(key === 'from' ? 'Toca el mapa para elegir el origen' : 'Toca el mapa para elegir el destino', ll => {
+      s[key] = { label: ll === meLatLng ? 'Mi ubicación' : `Punto (${ll.lat.toFixed(4)}, ${ll.lng.toFixed(4)})`, latlng: ll };
+      s.results = null; renderRouteSheet();
+    });
+  });
+  $('#calc').onclick = calcRoutes;
+  $$('[data-route]').forEach(b => b.onclick = () => { s.sel = +b.dataset.route; drawRoutes(); renderRouteSheet(); });
+}
+
+async function calcRoutes() {
+  const s = routeState, a = s.from.latlng, b = s.to.latlng;
+  s.loading = true; s.results = null; renderRouteSheet();
+  try {
+    const u = `https://routing.openstreetmap.de/routed-foot/route/v1/driving/${a.lng},${a.lat};${b.lng},${b.lat}?overview=full&geometries=geojson&alternatives=true`;
+    const res = await fetch(u);
+    const json = await res.json();
+    if (json.code !== 'Ok' || !json.routes?.length) throw new Error('route');
+    s.results = json.routes.slice(0, 3).map(r => ({
+      distance: r.distance, duration: r.duration,
+      coords: r.geometry.coordinates.map(([lng, lat]) => [lat, lng])
+    }));
+    analyzeRoutes();
+    s.sel = s.bestIdx;
+    s.loading = false;
+    drawRoutes(); renderRouteSheet();
+    map.fitBounds(L.latLngBounds(s.results.flatMap(r => r.coords)), { paddingTopLeft: [innerWidth >= 760 ? 420 : 30, 140], paddingBottomRight: [70, innerWidth >= 760 ? 40 : innerHeight * .45] });
+  } catch {
+    s.loading = false; renderRouteSheet();
+    toast('No se pudo calcular la ruta. Inténtalo de nuevo.');
+  }
+}
+
+function distM(a, b) { const dy = (a[0] - b[0]) * M_LAT, dx = (a[1] - b[1]) * M_LNG; return Math.hypot(dx, dy); }
+function analyze(coords) {
+  const pts = [];
+  for (let i = 0; i < coords.length - 1; i++) {
+    const a = coords[i], b = coords[i + 1], n = Math.max(1, Math.ceil(distM(a, b) / 20));
+    for (let k = 0; k < n; k++) pts.push([a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n]);
+  }
+  pts.push(coords[coords.length - 1]);
+  const segs = [], count = { g: 0, y: 0, r: 0, u: 0 };
+  let cur = null, sum = 0, known = 0;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const smp = sampleAt(pts[i][0], pts[i][1]);
+    const sc = smp.conf > .15 ? smp.score : null;
+    const cls = sc == null ? 'u' : sc < .34 ? 'g' : sc < .67 ? 'y' : 'r';
+    if (sc != null) { sum += sc; known++; }
+    count[cls]++;
+    if (!cur || cur.cls !== cls) { cur = { cls, pts: [pts[i]] }; segs.push(cur); }
+    cur.pts.push(pts[i + 1]);
+  }
+  const total = Math.max(1, pts.length - 1);
+  const share = { g: count.g / total, y: count.y / total, r: count.r / total, u: count.u / total };
+  const avg = known ? sum / known : null;
+  return { segs, share, avg, safety: avg == null ? null : Math.round((1 - avg) * 100) };
+}
+function analyzeRoutes() {
+  const s = routeState; if (!s.results) return;
+  const minD = Math.min(...s.results.map(r => r.distance));
+  let best = 0, bestRisk = Infinity;
+  s.results.forEach((r, i) => {
+    r.analysis = analyze(r.coords);
+    const a = r.analysis;
+    const risk = (a.avg ?? .4) + .8 * a.share.r + .25 * a.share.y + .3 * (r.distance / minD - 1);
+    if (risk < bestRisk) { bestRisk = risk; best = i; }
+  });
+  s.bestIdx = best;
+}
+function clearRouteLayers() { if (routeState.layers) { map.removeLayer(routeState.layers); routeState.layers = null; } }
+function drawRoutes() {
+  const s = routeState; clearRouteLayers();
+  const g = L.layerGroup();
+  s.results.forEach((r, i) => {
+    if (i === s.sel) return;
+    L.polyline(r.coords, { color: '#64748b', weight: 6, opacity: .55, dashArray: '2 9', lineCap: 'round' })
+      .on('click', () => { s.sel = i; drawRoutes(); renderRouteSheet(); }).addTo(g);
+  });
+  const r = s.results[s.sel];
+  L.polyline(r.coords, { color: '#fff', weight: 11, opacity: .95 }).addTo(g);
+  r.analysis.segs.forEach(sg => L.polyline(sg.pts, { color: ROUTE_COLORS[sg.cls], weight: 7, opacity: 1, lineCap: 'round' }).addTo(g));
+  L.marker(s.from.latlng, { icon: pinIcon('A', '#2563eb') }).addTo(g);
+  L.marker(s.to.latlng, { icon: pinIcon('B', '#6d28d9') }).addTo(g);
+  s.layers = g.addTo(map);
+}
+
+/* =====================================================================
+   Información / bienvenida
+   ===================================================================== */
+function openInfo() {
+  const all = allReports();
+  const verified = all.filter(r => r.status === 'verified').length;
+  openSheet(`${sheetHead('🛡️ SafeMap BCN')}
+    <p>Mapa colaborativo para que puedas <b>planificar por dónde ir</b> por Barcelona y evitar las calles donde otras mujeres se han sentido inseguras.</p>
+    <div class="legend" style="position:static;box-shadow:none;background:var(--bg-2);display:inline-block">
+      <div class="bar" style="width:220px"></div><div class="lbls"><span>🟢 Seguro</span><span>🟡 Medio</span><span>🔴 Inseguro</span></div></div>
+    <ul>
+      <li><b>Día / Noche:</b> la sensación cambia mucho con la hora. Por defecto ves la de ahora.</li>
+      <li><b>Ruta segura:</b> compara rutas a pie y te marca la más segura.</li>
+      <li><b>Reportar:</b> 100 % anónimo, sin registro.</li>
+      <li><b>Moderación:</b> un reporte necesita 2 confirmaciones para contar del todo, y se oculta si la comunidad lo marca como falso.</li>
+    </ul>
+    <div class="stats">
+      <div class="stat"><b>${all.length}</b><small>reportes</small></div>
+      <div class="stat"><b>${verified}</b><small>verificados</small></div>
+      <div class="stat"><b>${userReports.length}</b><small>tuyos</small></div>
+    </div>
+    <p class="warn">⚠️ <b>Prototipo.</b> Los reportes de ejemplo son <b>datos simulados</b> y no reflejan estadísticas reales.
+      Tus reportes y votos se guardan solo en este dispositivo.</p>
+    <p class="note">En caso de emergencia llama al <b>112</b> (botón rojo del mapa).</p>
+    <button class="btn" data-close>Empezar</button>`);
+  store.set('safemap.onboarded', true);
+}
+$('#btnInfo').onclick = openInfo;
+
+/* =====================================================================
+   Controles
+   ===================================================================== */
+$$('#modeChips .chip').forEach(c => c.onclick = () => {
+  mode = c.dataset.mode;
+  $$('#modeChips .chip').forEach(x => x.classList.toggle('active', x === c));
+  refresh();
+});
+$('#btnHeat').onclick = () => {
+  heatOn = !heatOn;
+  heatOn ? heat.addTo(map) : map.removeLayer(heat);
+  $('#btnHeat').classList.toggle('off', !heatOn);
+};
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (pickHandler) $('#hintCancel').click(); else if (!$('#sheet').classList.contains('hidden')) closeSheet(); } });
+
+refresh();
+if (!store.get('safemap.onboarded', false)) openInfo();
+</script>
+</body>
+</html>
