@@ -1,4 +1,6 @@
-# 🛡️ SafeMap BCN
+<p align="center"><img src="app%20logo.png" alt="SafeHer logo" width="180"></p>
+
+# SafeHer
 
 A collaborative, anonymous map that helps women plan how to get around Barcelona.
 
