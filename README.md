@@ -17,9 +17,12 @@ Abre `index.html` en el navegador, o la versión publicada en GitHub Pages.
 
 ## Tecnología
 
-- [Leaflet](https://leafletjs.com/) + teselas de [CARTO](https://carto.com/) / [OpenStreetMap](https://www.openstreetmap.org/)
-- Búsqueda: [Nominatim](https://nominatim.org/)
-- Rutas a pie: [OSRM](https://routing.openstreetmap.de/)
+- [Leaflet](https://leafletjs.com/) 1.9.4, **incluido dentro del propio index.html** (no depende de ningún CDN).
+- Mapa de calles con proveedores de respaldo: si uno falla o tarda más de 7 s se pasa al siguiente
+  (Esri World Street Map → OpenStreetMap DE → OSM France → OpenStreetMap). El modo noche oscurece el mismo mapa con un filtro CSS.
+- Búsqueda: [Nominatim](https://nominatim.org/) · Rutas a pie: [OSRM](https://routing.openstreetmap.de/)
+
+Enlaces directos:  (salta la bienvenida) y .
 
 ## ⚠️ Prototipo
 
