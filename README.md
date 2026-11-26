@@ -9,6 +9,8 @@ A collaborative, anonymous map that helps women plan how to get around Barcelona
 - **Safe route**: compares walking routes, highlights the safest one and colours each section.
 - **Anonymous reports**: no sign-up, location rounded to ~10 m.
 - **Community moderation**: a report needs 2 confirmations to count fully and is hidden if the community flags it as fake.
+- **Trusted circle**: save up to 5 trusted contacts and send your location or your trip (route + arrival time) via WhatsApp, SMS or the share menu. A check-in reminder asks if you are OK if you have not arrived on time.
+- **Walk together**: see verified women heading the same way and ask to walk together, meeting at a busy public spot (simulated profiles in this prototype).
 - One-tap **112** emergency button.
 
 The whole app is a single file: [`index.html`](index.html) (HTML + CSS + JS).

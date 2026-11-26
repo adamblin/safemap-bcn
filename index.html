@@ -962,6 +962,52 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .figures { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; margin-top: 16px; }
   .figures b { color: var(--text); }
 
+  /* ---------- Trusted circle & walk together ---------- */
+  .avatar { border-radius: 50%; color: #fff; font-weight: 700; display: grid; place-items: center; flex: none; font-size: 15px; }
+  .contacts { display: grid; gap: 6px; }
+  .contact { display: flex; align-items: center; gap: 12px; padding: 8px 4px 8px 10px; border: 1.5px solid var(--line); border-radius: var(--r-md); }
+  .contact > div { flex: 1; min-width: 0; }
+  .contact small { display: block; color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  .empty-state { display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: 13.5px; padding: 12px; border: 1.5px dashed var(--line); border-radius: var(--r-md); }
+  .count { color: var(--muted); font-weight: 400; font-size: 12.5px; margin-left: 4px; font-variant-numeric: tabular-nums; }
+  .add-contact { display: grid; gap: 8px; margin-top: 10px; }
+  .add-contact input { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; padding: 11px 12px; font: inherit; font-size: 15px; background: var(--bg); color: var(--text); }
+  .add-contact input:focus { border-color: var(--focus); outline: none; }
+  .add-contact .btn { margin-top: 0; }
+  .row-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .row-btns .btn { margin-top: 0; font-size: 14px; }
+  .msg-preview { font-size: 13px; line-height: 1.5; padding: 12px; border-radius: var(--r-sm); background: var(--brand-soft); color: var(--text); word-break: break-word; }
+  .targets { display: grid; gap: 6px; margin-top: 10px; }
+  .target { display: flex; align-items: center; gap: 10px; }
+  .t-name { flex: 1; font-weight: 600; font-size: 14px; }
+  .mini-btn { border: 1.5px solid var(--line); background: var(--bg); color: var(--text); border-radius: 10px; padding: 7px 12px; font-size: 13px; font-weight: 600; text-decoration: none; transition: background .15s; }
+  .mini-btn:hover { background: var(--surface-2); }
+  .trip-card { border: 1.5px solid var(--line); border-radius: var(--r-md); padding: 12px 14px; display: grid; gap: 6px; font-size: 14px; }
+  .trip-line { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+  .trip-line .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .trip-meta { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .trip-meta b { color: var(--text); }
+  .trip-bar .i { color: var(--brand); }
+  .trip-bar.late { background: color-mix(in srgb, var(--danger) 14%, var(--bg)); }
+  .trip-bar.late .i { color: var(--danger); }
+  .link-btn.call { color: var(--danger); text-decoration: none; }
+  @media (max-width: 759px) { body:has(#sheet:not(.hidden)) .corner-logo { display: none; } }
+  body:has(#tripBar:not(.hidden)) .corner-logo, body:has(#mapStatus:not(.hidden)) .corner-logo { display: none; }
+  .mates { display: grid; gap: 10px; }
+  .mate { border: 1.5px solid var(--line); border-radius: var(--r-md); padding: 12px; }
+  .mate .btn { margin-top: 10px; height: 44px; font-size: 14px; }
+  .mate-top { display: flex; gap: 12px; align-items: center; }
+  .mate-info { flex: 1; min-width: 0; }
+  .mate-info b { font-size: 15px; }
+  .mate-info small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+  .verified { display: inline-flex; align-items: center; gap: 3px; margin-left: 6px; font-size: 11.5px; font-weight: 600; color: var(--safe); vertical-align: 1px; }
+  .verified .i { width: 13px; height: 13px; }
+  .match { text-align: right; font-weight: 700; font-size: 18px; color: var(--brand); font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .match small { display: block; font-size: 11px; font-weight: 500; color: var(--muted); }
+  .mate-meta { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; margin-top: 10px; }
+  .note.ok { background: color-mix(in srgb, var(--safe) 12%, var(--bg)); color: var(--text); margin-top: 10px; }
+  .note.ok .i { color: var(--safe); }
+
   /* ---------- Popups and markers ---------- */
   .leaflet-container { font-family: var(--font); background: var(--map-bg); }
   .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--bg); color: var(--text); box-shadow: var(--shadow-2); }
@@ -1031,6 +1077,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <symbol id="i-train" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14M9 21l-2-4M15 21l2-4M9 14h.01M15 14h.01"/></symbol>
     <symbol id="i-road" viewBox="0 0 24 24"><path d="M5 21 9 3M19 21 15 3M12 5v2M12 11v2M12 17v2"/></symbol>
     <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3Z"/><path d="M9 3v15M15 6v15"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
     <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z"/></symbol>
   </defs>
 </svg>
@@ -1057,6 +1105,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <svg class="i"><use href="#i-alert"/></svg><span id="mapStatusText"></span>
     <button id="mapRetry" class="link-btn">Retry</button>
   </div>
+  <div id="tripBar" class="status-bar trip-bar hidden" role="status">
+    <svg class="i"><use href="#i-share"/></svg><span id="tripText"></span>
+    <a id="tripCall" class="link-btn call hidden" href="tel:112">Call 112</a>
+    <button id="tripDone" class="link-btn">I’ve arrived</button>
+  </div>
 </header>
 
 <div class="controls">
@@ -1065,6 +1118,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <button id="zoomOut" class="zoom-only" aria-label="Zoom out"><svg class="i"><use href="#i-minus"/></svg></button>
     <button id="btnLocate" aria-label="Go to my location"><svg class="i"><use href="#i-locate"/></svg></button>
     <button id="btnHeat" aria-label="Hide heat map" aria-pressed="true"><svg class="i"><use href="#i-layers"/></svg></button>
+    <button id="btnCircle" aria-label="Trusted circle: share your location"><svg class="i"><use href="#i-users"/></svg></button>
   </div>
   <a href="tel:112" class="sos" aria-label="Emergency: call 112"><svg class="i"><use href="#i-phone"/></svg>112</a>
 </div>
@@ -1895,7 +1949,8 @@ function renderRouteSheet() {
         <div class="mix" aria-hidden="true">${['g', 'y', 'r', 'u'].filter(k => a.share[k] > 0).map(k => `<span style="flex:${a.share[k]};background:${ROUTE_COLORS[k]}"></span>`).join('')}</div>
         ${a.share.r > .05 ? `<div class="warn-line">${ic('alert', 'sm')}${Math.round(a.share.r * 100)}% of the way through unsafe areas</div>` : ''}
       </button>`;
-    }).join('') + `</div><div class="note">${ic('info')}<span>Safety based on <b>${MODE_LABEL[mode]().toLowerCase()}</b> reports. Grey sections have no data.</span></div>`;
+    }).join('') + `</div><div class="note">${ic('info')}<span>Safety based on <b>${MODE_LABEL[mode]().toLowerCase()}</b> reports. Grey sections have no data.</span></div>
+      <div class="row-btns"><button class="btn soft" id="shareTrip">${ic('share')}Share trip</button><button class="btn soft" id="walkTogether">${ic('users')}Walk together</button></div>`;
   }
   openSheet('route', `${sheetHead('Safe route')}
     <div class="route-fields">
@@ -1921,6 +1976,8 @@ function renderRouteSheet() {
   });
   $('#calc').onclick = calcRoutes;
   if ($('#retryRoute')) $('#retryRoute').onclick = calcRoutes;
+  if ($('#shareTrip')) $('#shareTrip').onclick = openShareTrip;
+  if ($('#walkTogether')) $('#walkTogether').onclick = openWalk;
   $$('[data-route]').forEach(b => b.onclick = () => { s.sel = +b.dataset.route; drawRoutes(); renderRouteSheet(); });
 }
 
@@ -2010,6 +2067,8 @@ function openInfo() {
       <dt>${ic('clock')}</dt><dd><b>Day or night.</b> How safe a place feels changes with the time; by default you see the current one.</dd>
       <dt>${ic('route')}</dt><dd><b>Safe route.</b> Compares walking routes and highlights the safest.</dd>
       <dt>${ic('lock')}</dt><dd><b>Anonymous reports.</b> No sign-up and no personal data.</dd>
+      <dt>${ic('share')}</dt><dd><b>Trusted circle.</b> Send your location or your trip to people you trust, and check in when you arrive.</dd>
+      <dt>${ic('heart')}</dt><dd><b>Walk together.</b> Find verified women going your way and walk with them.</dd>
       <dt>${ic('users')}</dt><dd><b>Community moderated.</b> A report counts fully after 2 confirmations and is hidden if people flag it as fake.</dd>
     </dl>
     <p class="figures"><b>${all.length}</b> reports · <b>${verified}</b> verified · <b>${userReports.length}</b> yours</p>
@@ -2019,6 +2078,174 @@ function openInfo() {
   store.set('safemap.onboarded', true);
 }
 $('#btnInfo').onclick = openInfo;
+
+/* =====================================================================
+   Trusted circle: share location / trip with people you trust
+   Messages are only sent when the user taps WhatsApp, SMS or Share.
+   ===================================================================== */
+let contacts = store.get('safemap.contacts', []);
+let trip = store.get('safemap.trip', null);
+const fmtClock = ts => new Date(ts).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+const mapLink = ll => `https://maps.google.com/?q=${ll.lat.toFixed(5)},${ll.lng.toFixed(5)}`;
+const digits = p => p.replace(/[^\d+]/g, '').replace(/^00/, '+');
+const AVATAR_COLORS = ['#7c3aed', '#db2777', '#0891b2', '#ea580c', '#16a34a', '#4f46e5', '#be123c', '#0d9488'];
+const avatar = (name, size = 36) => {
+  const c = AVATAR_COLORS[[...name].reduce((a, ch) => a + ch.charCodeAt(0), 0) % AVATAR_COLORS.length];
+  return `<span class="avatar" style="width:${size}px;height:${size}px;background:${c}">${esc(name.trim()[0] || '?').toUpperCase()}</span>`;
+};
+
+function shareTargets(msg) {
+  const enc = encodeURIComponent(msg);
+  return `<div class="msg-preview">${esc(msg)}</div>
+    ${contacts.length ? `<div class="targets">${contacts.map((c, i) => `<div class="target">
+        ${avatar(c.name, 32)}<span class="t-name">${esc(c.name)}</span>
+        <a class="mini-btn" href="https://wa.me/${digits(c.phone).replace('+', '')}?text=${enc}" target="_blank" rel="noopener">WhatsApp</a>
+        <a class="mini-btn" href="sms:${esc(digits(c.phone))}?&body=${enc}">SMS</a></div>`).join('')}</div>`
+      : `<p class="lede" style="font-size:13px">Add trusted contacts to send this in one tap.</p>`}
+    <div class="row-btns">
+      ${navigator.share ? `<button class="btn soft" data-share>${ic('share')}Share via…</button>` : ''}
+      <button class="btn soft" data-copy>${ic('copy')}Copy message</button>
+    </div>`;
+}
+function bindShare(root, msg) {
+  const s = $('[data-share]', root), c = $('[data-copy]', root);
+  if (s) s.onclick = () => navigator.share({ text: msg }).catch(() => {});
+  if (c) c.onclick = () => (navigator.clipboard?.writeText(msg) || Promise.reject()).then(() => toast('Message copied', 'copy')).catch(() => toast('Couldn’t copy. Select the text and copy it.', 'alert'));
+}
+
+function openCircle(prefillMsg) {
+  openSheet('circle', `${sheetHead('Trusted circle')}
+    <p class="lede">Share where you are with people you trust. Nothing is sent until you tap WhatsApp, SMS or Share.</p>
+    <h3>Your contacts <span class="count">${contacts.length}/5</span></h3>
+    <div class="contacts">${contacts.length ? contacts.map((c, i) => `<div class="contact">${avatar(c.name)}
+        <div><b>${esc(c.name)}</b><small>${esc(c.phone)}</small></div>
+        <button class="icon-btn" data-del="${i}" aria-label="Remove ${esc(c.name)}">${ic('trash', 'sm')}</button></div>`).join('')
+      : `<div class="empty-state">${ic('users')}<span>No contacts yet. Add a friend, partner or family member.</span></div>`}</div>
+    ${contacts.length < 5 ? `<form class="add-contact" id="addContact" autocomplete="off">
+        <label class="sr" for="cName">Name</label><input id="cName" placeholder="Name" maxlength="30" required>
+        <label class="sr" for="cPhone">Phone</label><input id="cPhone" type="tel" placeholder="Phone, e.g. +34 600 000 000" maxlength="20" required>
+        <button class="btn soft" type="submit">${ic('plus')}Add contact</button></form>` : ''}
+    <h3>Send a quick message</h3>
+    <div class="row-btns">
+      <button class="btn" id="shareLoc">${ic('locate')}Share my location</button>
+      <button class="btn soft" id="shareSafe">${ic('check')}I got home safe</button>
+    </div>
+    <div id="shareOut"></div>`);
+  const body = $('#sheetBody');
+  $$('[data-del]', body).forEach(b => b.onclick = () => { contacts.splice(+b.dataset.del, 1); store.set('safemap.contacts', contacts); openCircle(); });
+  const form = $('#addContact');
+  if (form) form.onsubmit = e => {
+    e.preventDefault();
+    const name = $('#cName').value.trim(), phone = $('#cPhone').value.trim();
+    if (!name || digits(phone).replace('+', '').length < 6) { toast('Enter a name and a valid phone number', 'alert'); return; }
+    contacts.push({ name, phone }); store.set('safemap.contacts', contacts); openCircle();
+    toast(`${name} added to your trusted circle`, 'heart');
+  };
+  const show = msg => { $('#shareOut').innerHTML = '<h3>Send it to</h3>' + shareTargets(msg); bindShare($('#shareOut'), msg); $('#shareOut').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); };
+  $('#shareLoc').onclick = () => {
+    $('#shareLoc').disabled = true;
+    locate(false).then(ll => show(`I'm sharing my location with you from SafeHer: ${mapLink(ll)} (sent at ${fmtClock(Date.now())}).`))
+      .catch(() => {}).finally(() => { if ($('#shareLoc')) $('#shareLoc').disabled = false; });
+  };
+  $('#shareSafe').onclick = () => { endTrip(); show(`I got home safe. Thanks for keeping an eye on me 💜`); };
+  if (prefillMsg) show(prefillMsg);
+}
+
+/* ---- Share a trip + arrival check-in ---- */
+function openShareTrip() {
+  const s = routeState, r = s.results[s.sel], eta = Date.now() + r.duration * 1000;
+  const msg = `I'm walking from ${s.from.label} to ${s.to.label} with SafeHer. Expected arrival around ${fmtClock(eta)} (${fmtTime(r.duration)}). `
+    + `Route: https://www.openstreetmap.org/directions?engine=fossgis_osrm_foot&route=${s.from.latlng.lat.toFixed(5)},${s.from.latlng.lng.toFixed(5)};${s.to.latlng.lat.toFixed(5)},${s.to.latlng.lng.toFixed(5)} . I'll text you when I arrive.`;
+  trip = { to: s.to.label, eta, started: Date.now() }; store.set('safemap.trip', trip); renderTrip();
+  openSheet('share', `${sheetHead('Share your trip')}
+    <div class="trip-card">
+      <div class="trip-line"><span class="dot" style="background:#2563eb"></span>${esc(s.from.label)}</div>
+      <div class="trip-line"><span class="dot" style="background:#5b21b6"></span>${esc(s.to.label)}</div>
+      <div class="trip-meta">${ic('clock', 'sm')}Arriving around <b>${fmtClock(eta)}</b> · ${fmtDist(r.distance)}${r.analysis.safety != null ? ` · ${r.analysis.safety}% safety` : ''}</div>
+    </div>
+    <p class="lede" style="font-size:13px">We'll remind you to check in when you arrive. If you don't, SafeHer will ask if you're OK.</p>
+    <h3>Send it to</h3>${shareTargets(msg)}
+    <button class="btn soft" id="backRoute">${ic('route')}Back to the route</button>
+    ${contacts.length ? '' : `<button class="btn" id="goCircle">${ic('users')}Add trusted contacts</button>`}`);
+  bindShare($('#sheetBody'), msg);
+  $('#backRoute').onclick = renderRouteSheet;
+  if ($('#goCircle')) $('#goCircle').onclick = () => openCircle(msg);
+}
+function endTrip() { trip = null; store.set('safemap.trip', null); renderTrip(); }
+function renderTrip() {
+  const bar = $('#tripBar');
+  if (!trip) { bar.classList.add('hidden'); return; }
+  if (Date.now() - trip.eta > 3 * 3600e3) { endTrip(); return; } // forget very old trips
+  const late = Date.now() > trip.eta + 5 * 60e3;
+  bar.classList.toggle('late', late);
+  $('#tripText').innerHTML = late
+    ? `<b>Are you OK?</b> You were due at ${fmtClock(trip.eta)}.`
+    : `Trip shared · arriving ~${fmtClock(trip.eta)}`;
+  $('#tripCall').classList.toggle('hidden', !late);
+  bar.classList.remove('hidden');
+}
+$('#tripDone').onclick = () => { const msg = `I've arrived safely${trip ? ' at ' + trip.to : ''}. Thanks for keeping an eye on me 💜`; endTrip(); openCircle(msg); };
+setInterval(renderTrip, 30000);
+renderTrip();
+$('#btnCircle').onclick = () => openCircle();
+
+/* =====================================================================
+   Walk together: women with a similar route (simulated in this prototype)
+   ===================================================================== */
+const walkState = { req: {} };
+function companions() {
+  const s = routeState, a = s.from.latlng, b = s.to.latlng;
+  const rnd = mulberry32(Math.round(a.lat * 1e4) * 31 + Math.round(b.lng * 1e4));
+  const NAMES = ['Laura', 'Marta', 'Aïcha', 'Sofía', 'Júlia', 'Noa', 'Carla', 'Irene', 'Paula', 'Mei', 'Lucía', 'Fatima'];
+  const ABOUT = ['UB student', 'UPF student', 'UPC student', 'Nurse at Hospital Clínic', 'Works in the Eixample', 'Erasmus student', 'Lives in Gràcia', 'Bartender, finishes late'];
+  const n = 3 + Math.floor(rnd() * 3), used = new Set(), out = [];
+  for (let i = 0; i < n; i++) {
+    let name; do { name = NAMES[Math.floor(rnd() * NAMES.length)]; } while (used.has(name)); used.add(name);
+    const off = () => (rnd() - .5) * .008;
+    const start = L.latLng(a.lat + off(), a.lng + off()), end = L.latLng(b.lat + off(), b.lng + off());
+    const overlap = Math.max(.35, Math.min(.97, 1 - (a.distanceTo(start) + b.distanceTo(end)) / 1800));
+    out.push({
+      id: name, name, age: 19 + Math.floor(rnd() * 14), about: ABOUT[Math.floor(rnd() * ABOUT.length)],
+      verified: rnd() < .85, rating: (4.6 + rnd() * .4).toFixed(1), walks: 2 + Math.floor(rnd() * 40),
+      leaves: [0, 5, 10, 15, 20, 30][Math.floor(rnd() * 6)], overlap
+    });
+  }
+  return out.sort((x, y) => y.overlap - x.overlap);
+}
+function meetingPoint() {
+  const from = routeState.from.latlng;
+  let best = null, d = 700;
+  for (const p of LANDMARKS) { const k = from.distanceTo(p.latlng); if (k < d && p.kind !== 'area') { d = k; best = p.label; } }
+  return best || 'your starting point';
+}
+function openWalk() {
+  const s = routeState, list = companions(), meet = meetingPoint();
+  openSheet('walk', `${sheetHead('Walk together')}
+    <p class="lede">Women heading the same way as you, right now. Walking with someone is one of the best ways to feel safer at night.</p>
+    <div class="mates">${list.map(m => {
+      const st = walkState.req[m.id];
+      return `<div class="mate">
+        <div class="mate-top">${avatar(m.name, 44)}
+          <div class="mate-info"><b>${esc(m.name)}, ${m.age}</b>${m.verified ? `<span class="verified">${ic('shield', 'sm')}Verified</span>` : ''}
+            <small>${esc(m.about)} · ★ ${m.rating} · ${m.walks} walks</small></div>
+          <span class="match">${Math.round(m.overlap * 100)}%<small>same route</small></span></div>
+        <div class="mate-meta">${ic('clock', 'sm')}${m.leaves ? `Leaving in ${m.leaves} min` : 'Leaving now'}</div>
+        ${st === 'ok' ? `<div class="note ok">${ic('check')}<span><b>${esc(m.name)} accepted.</b> Meet at <b>${esc(meet)}</b>, a busy, well-lit spot. Share your trip with your trusted circle before you go.</span></div>
+            <button class="btn soft" data-sharetrip>${ic('share')}Share trip</button>`
+        : st === 'wait' ? `<button class="btn soft" disabled><span class="searching">Waiting for ${esc(m.name)}…</span></button>`
+        : `<button class="btn" data-ask="${esc(m.id)}" ${m.verified ? '' : 'disabled title="Only verified profiles can be contacted"'}>${ic('users')}${m.verified ? 'Ask to walk together' : 'Not verified yet'}</button>`}
+      </div>`;
+    }).join('')}</div>
+    <div class="note">${ic('lock')}<span><b>Safety first.</b> Only verified women can join. You only see first names, never addresses, and you always meet in a public place.</span></div>
+    <div class="note warn">${ic('alert')}<span><b>Demo.</b> These profiles are simulated to show how the feature would work.</span></div>
+    <button class="btn soft" id="backRoute">${ic('route')}Back to the route</button>`);
+  $$('[data-ask]').forEach(b => b.onclick = () => {
+    const id = b.dataset.ask; walkState.req[id] = 'wait'; openWalk();
+    setTimeout(() => { walkState.req[id] = 'ok'; if (sheetKind === 'walk') openWalk(); toast(`${id} wants to walk with you`, 'heart'); }, 2500);
+  });
+  $$('[data-sharetrip]').forEach(b => b.onclick = openShareTrip);
+  $('#backRoute').onclick = renderRouteSheet;
+}
 
 /* =====================================================================
    Controls
